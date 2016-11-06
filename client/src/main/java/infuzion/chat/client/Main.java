@@ -6,14 +6,20 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 public class Main extends Application{
     public static void main(String[] args) throws IOException {
-        if(args.length < 2){
-            new Thread(new Client("127.0.0.1", 7763)).start();
+        if (args.length < 3) {
+            Scanner in = new Scanner(System.in);
+            System.out.println("Enter your name.");
+            String name = in.nextLine();
+            System.out.println("Nice name: " + name);
+            new Thread(new Client("127.0.0.1", 7763, name)).start();
         } else {
-            new Thread(new Client(args[0], Integer.valueOf(args[1]))).start();
+            new Thread(new Client(args[0], Integer.valueOf(args[1]), args[2])).start();
         }
+
         launch(args);
     }
 

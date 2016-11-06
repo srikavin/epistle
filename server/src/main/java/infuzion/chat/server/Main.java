@@ -23,7 +23,6 @@ public class Main extends Application{
 
     @Override
     public void start(Stage stage) throws Exception {
-        stage.setFullScreen(true);
         StackPane stackPane = new StackPane();
 
         stage.setTitle("123");

@@ -6,21 +6,21 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.Scanner;
-import java.util.UUID;
+import java.util.*;
 
-public class Client implements Runnable {
-    private Scanner scanner = new Scanner(System.in);
-    private Socket sock;
+class Client implements Runnable {
+    private Scanner scanner;
     private DataInputStream input;
     private DataOutputStream output;
+    private Map<UUID, String> uuidStringMap = new HashMap<>();
 
-    public Client(String ip, int port) throws IOException {
-        sock = new Socket(ip, port);
+    Client(String ip, int port, String username) throws IOException {
+        Socket sock = new Socket(ip, port);
         input = new DataInputStream(sock.getInputStream());
         output = new DataOutputStream(sock.getOutputStream());
+        scanner = new Scanner(System.in);
         output.writeByte(DataType.ClientHello.byteValue);
-        output.writeUTF(UUID.randomUUID().toString());
+        output.writeUTF(username);
         output.writeByte(DataType.EndOfData.byteValue);
         new Thread(() -> {
             try {
@@ -48,6 +48,20 @@ public class Client implements Runnable {
                 e.printStackTrace();
             }
         }).start();
+
+        Timer heartbeat = new Timer();
+        heartbeat.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    output.writeByte(DataType.Heartbeat.byteValue);
+                    output.writeUTF("heart");
+                    output.writeByte(DataType.EndOfData.byteValue);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, 10, 5000);
     }
 
     /**

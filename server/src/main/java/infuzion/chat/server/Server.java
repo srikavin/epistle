@@ -7,23 +7,20 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class Server implements Runnable {
+    private final List<DataInputStream> clientInput = new ArrayList<>();
     private ServerSocket socket;
-    private List<ChatRoom> chatRooms = new ArrayList<>();
     private List<ChatClient> clients = new ArrayList<>();
     private List<Socket> clientSockets = new ArrayList<>();
     private List<DataOutputStream> clientOutput = new ArrayList<>();
-    private final List<DataInputStream> clientInput = new ArrayList<>();
+    private Map<ChatClient, Integer> heartbeat = new HashMap<>();
     private ChatRoomManager chatRoomManager;
 
     Server(int port) throws IOException {
         socket = new ServerSocket(port);
         chatRoomManager = new ChatRoomManager();
-        chatRooms.add(new ChatRoom("default"));
         new Thread(() -> {
             while(true) {
                 try {
@@ -38,6 +35,24 @@ public class Server implements Runnable {
                 }
             }
         }).start();
+
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                for (Map.Entry<ChatClient, Integer> e : heartbeat.entrySet()) {
+                    e.setValue(e.getValue() - 1000);
+                    if (e.getValue() <= 0) {
+                        heartbeat.remove(e.getKey());
+                        chatRoomManager.removeClient(e.getKey());
+                        System.out.println("Removed client: ");
+                        System.out.println("UUID: " + e.getKey().getUuid());
+                        System.out.println("Name: " + e.getKey().getName());
+                        System.out.println();
+                    }
+                }
+            }
+        }, 10, 1000);
     }
 
     /**
@@ -55,17 +70,15 @@ public class Server implements Runnable {
     public void run() {
         try {
             while (true) {
-                int counter = 0;
                 synchronized (clientInput) {
-                    for (DataInputStream e : clientInput) {
+                    for (int i = 0, clientInputSize = clientInput.size(); i < clientInputSize; i++) {
+                        DataInputStream e = clientInput.get(i);
                         if (e.available() <= 0) {
-//                        System.out.println("skipping");
                             continue;
                         }
                         byte messageType = e.readByte();
                         String message = e.readUTF();
                         byte end = e.readByte();
-                        System.out.println(message);
 
                         if (end != DataType.EndOfData.byteValue) {
                             continue;
@@ -75,20 +88,34 @@ public class Server implements Runnable {
                             continue;
                         }
 
+                        if (mType.equals(DataType.Heartbeat)) {
+                            if (message.equals("heart")) {
+                                ChatClient client = ChatClient.fromSocket(clientSockets.get(i));
+                                client.sendData("beat", DataType.Heartbeat);
+                                heartbeat.replace(client, 10000);
+                            }
+                        }
                         if (mType.equals(DataType.ClientHello)) {
-                            ChatClient client = new ChatClient(message, UUID.randomUUID(), clientSockets.get(counter));
+                            ChatClient client = new ChatClient(message, UUID.randomUUID(), clientSockets.get(i));
+                            heartbeat.put(client, 10000);
                             clients.add(client);
                             client.sendData(client.getUuid().toString(), DataType.UUIDAssign);
+                            chatRoomManager.addClient(client);
+
+                            System.out.println("Client connected: ");
+                            System.out.println("UUID: " + client.getUuid());
+                            System.out.println("Name: " + client.getName());
+                            System.out.println();
+
                         } else if (mType.equals(DataType.Message)) {
-                            ChatClient client = ChatClient.fromSocket(clientSockets.get(counter));
+                            ChatClient client = ChatClient.fromSocket(clientSockets.get(i));
                             if (client == null) {
                                 continue;
                             }
-                            client.sendMessage(message);
-                            System.out.println(message);
+                            chatRoomManager.sendMessageAll(message, client, client.getChatRoom());
+                            System.out.println(client.getPrefix() + message);
                         }
 
-                        counter++;
                     }
                 }
                 Thread.sleep(250);

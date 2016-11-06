@@ -16,6 +16,7 @@ public class ChatClient {
     private String prefix;
     private String color;
     private DataOutputStream outputStream;
+    private ChatRoom currentChatRoom;
 
     ChatClient(String name, UUID uuid, Socket socket) {
         this.name = name;
@@ -29,6 +30,10 @@ public class ChatClient {
         prefix = "[" + name + "] ";
     }
 
+    static ChatClient fromSocket(Socket sock) {
+        return clientSocketMap.get(sock);
+    }
+
     public UUID getUuid() {
         return uuid;
     }
@@ -39,24 +44,32 @@ public class ChatClient {
 
     void sendMessage(String message){
         sendData(message, DataType.Message);
+    }
 
+    ChatRoom getChatRoom() {
+        return currentChatRoom;
+    }
+
+    void setChatRoom(ChatRoom chatRoom) {
+        this.currentChatRoom = chatRoom;
     }
 
     void sendData(String data, DataType id){
         try {
             outputStream.writeByte(id.byteValue);
             outputStream.writeUTF(data);
-            outputStream.writeUTF(String.valueOf(DataType.EndOfData));
+            outputStream.writeByte(DataType.EndOfData.byteValue);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    static ChatClient fromSocket(Socket sock){
-        return clientSocketMap.get(sock);
-    }
-
     public String getPrefix() {
         return prefix;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ChatClient && this.uuid.equals(((ChatClient) obj).getUuid());
     }
 }
