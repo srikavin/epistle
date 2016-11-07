@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<TitledPane xmlns:fx="http://javafx.com/fxml/1" animated="false" maxHeight="-Infinity" maxWidth="-Infinity"
+            minHeight="-Infinity" minWidth="-Infinity" prefHeight="183.0" prefWidth="600.0" text="Options"
+            xmlns="http://javafx.com/javafx/8.0.60" fx:controller="infuzion.chat.client.Controller">
+    <content>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="162.0" prefWidth="598.0">
+            <children>
+                <TextField fx:id="username" layoutX="10.0" layoutY="14.0" prefHeight="25.0" prefWidth="578.0"
+                           promptText="Username"/>
+                <TextField fx:id="ip" layoutX="10.0" layoutY="49.0" prefHeight="25.0" prefWidth="578.0"
+                           promptText="IP to connect to"/>
+                <TextField fx:id="port" layoutX="10.0" layoutY="87.0" prefHeight="25.0" prefWidth="578.0"
+                           promptText="Port"/>
+                <Button fx:id="submit" layoutX="10.0" layoutY="122.0" mnemonicParsing="false" onAction="#submit"
+                        text="Submit"/>
+            </children>
+        </AnchorPane>
+    </content>
+</TitledPane>

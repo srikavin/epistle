@@ -5,11 +5,12 @@ import infuzion.chat.common.DataType;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-public class Server implements Runnable {
+class Server implements Runnable {
     private final List<DataInputStream> clientInput = new ArrayList<>();
     private ServerSocket socket;
     private List<ChatClient> clients = new ArrayList<>();
@@ -18,8 +19,11 @@ public class Server implements Runnable {
     private Map<ChatClient, Integer> heartbeat = new HashMap<>();
     private ChatRoomManager chatRoomManager;
 
+    @SuppressWarnings("InfiniteLoopStatement")
     Server(int port) throws IOException {
-        socket = new ServerSocket(port);
+        System.out.println();
+        socket = new ServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
+        System.out.println("Binded to port " + socket.getLocalPort() + " at " + socket.getInetAddress().toString());
         chatRoomManager = new ChatRoomManager();
         new Thread(() -> {
             while(true) {
@@ -66,6 +70,7 @@ public class Server implements Runnable {
      *
      * @see Thread#run()
      */
+    @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
         try {

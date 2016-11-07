@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.*;
 
 class Client implements Runnable {
-    private Scanner scanner;
+    private static Controller controller;
     private DataInputStream input;
     private DataOutputStream output;
     private Map<UUID, String> uuidStringMap = new HashMap<>();
@@ -18,36 +18,10 @@ class Client implements Runnable {
         Socket sock = new Socket(ip, port);
         input = new DataInputStream(sock.getInputStream());
         output = new DataOutputStream(sock.getOutputStream());
-        scanner = new Scanner(System.in);
         output.writeByte(DataType.ClientHello.byteValue);
         output.writeUTF(username);
         output.writeByte(DataType.EndOfData.byteValue);
-        new Thread(() -> {
-            try {
-                while (true) {
-                    if (input.available() <= 0) {
-                        continue;
-                    }
-                    byte messageType = input.readByte();
-                    String message = input.readUTF();
-                    byte end = input.readByte();
-                    if (end != DataType.EndOfData.byteValue) {
-                        continue;
-                    }
-                    DataType mType = DataType.valueOf(messageType);
-                    if (mType == null) {
-                        continue;
-                    }
-
-                    if (mType.equals(DataType.Message)) {
-                        System.out.println(message);
-                    }
-                    Thread.sleep(250);
-                }
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();
+        Controller.setClient(this);
 
         Timer heartbeat = new Timer();
         heartbeat.schedule(new TimerTask() {
@@ -64,29 +38,46 @@ class Client implements Runnable {
         }, 10, 5000);
     }
 
-    /**
-     * When an object implementing interface <code>Runnable</code> is used
-     * to create a thread, starting the thread causes the object's
-     * <code>run</code> method to be called in that separately executing
-     * thread.
-     * <p>
-     * The general contract of the method <code>run</code> is that it may
-     * take any action whatsoever.
-     *
-     * @see Thread#run()
-     */
+    public static void setController(Controller controller) {
+        Client.controller = controller;
+    }
+
+    public void sendMessage(String string) {
+        try {
+            output.writeByte(DataType.Message.byteValue);
+            output.writeUTF(string);
+            output.writeByte(DataType.EndOfData.byteValue);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressWarnings("InfiniteLoopStatement")
     public void run() {
-        while (true) {
-            try {
-                if (scanner.hasNext()) {
-                    output.writeByte(DataType.Message.byteValue);
-                    output.writeUTF(scanner.nextLine());
-                    output.writeByte(DataType.EndOfData.byteValue);
+        try {
+            while (true) {
+                if (input.available() <= 0) {
+                    continue;
+                }
+                byte messageType = input.readByte();
+                String message = input.readUTF();
+                byte end = input.readByte();
+                if (end != DataType.EndOfData.byteValue) {
+                    continue;
+                }
+                DataType mType = DataType.valueOf(messageType);
+                if (mType == null) {
+                    continue;
+                }
+
+                if (mType.equals(DataType.Message)) {
+                    System.out.println(message);
+                    controller.displayMessage(message + "\n");
                 }
                 Thread.sleep(250);
-            } catch (InterruptedException | IOException e) {
-                e.printStackTrace();
             }
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
         }
     }
 }

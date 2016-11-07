@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class ChatClient {
+class ChatClient {
     private final static Map<Socket, ChatClient> clientSocketMap = new HashMap<>();
     private final String name;
     private final UUID uuid;

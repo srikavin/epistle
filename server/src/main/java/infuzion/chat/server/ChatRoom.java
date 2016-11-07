@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-public class ChatRoom {
+class ChatRoom {
     private final String name;
     private final UUID uuid;
     private List<ChatClient> clients = new LinkedList<>();
