@@ -1,6 +1,7 @@
 package infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
+import infuzion.chat.server.command.Commands;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -10,7 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-class Server implements Runnable {
+public class Server implements Runnable {
     private final List<DataInputStream> clientInput = new ArrayList<>();
     private ServerSocket socket;
     private List<ChatClient> clients = new ArrayList<>();
@@ -119,6 +120,14 @@ class Server implements Runnable {
                             }
                             chatRoomManager.sendMessageAll(message, client, client.getChatRoom());
                             System.out.println(client.getPrefix() + message);
+                        } else if (mType.equals(DataType.Command)) {
+                            System.out.println(message);
+                            String[] split = message.split(" ");
+                            if (split.length > 1) {
+                                String command = split[0].replace("/", "");
+                                String[] args = Arrays.copyOfRange(split, 1, command.length());
+                                Commands.executeCommand(command, args, ChatClient.fromSocket(clientSockets.get(i)));
+                            }
                         }
 
                     }

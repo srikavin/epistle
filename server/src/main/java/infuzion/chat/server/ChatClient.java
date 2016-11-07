@@ -9,7 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-class ChatClient {
+@SuppressWarnings("WeakerAccess")
+public class ChatClient {
     private final static Map<Socket, ChatClient> clientSocketMap = new HashMap<>();
     private final String name;
     private final UUID uuid;
@@ -18,7 +19,7 @@ class ChatClient {
     private DataOutputStream outputStream;
     private ChatRoom currentChatRoom;
 
-    ChatClient(String name, UUID uuid, Socket socket) {
+    public ChatClient(String name, UUID uuid, Socket socket) {
         this.name = name;
         this.uuid = uuid;
         try {
@@ -30,7 +31,7 @@ class ChatClient {
         prefix = "[" + name + "] ";
     }
 
-    static ChatClient fromSocket(Socket sock) {
+    public static ChatClient fromSocket(Socket sock) {
         return clientSocketMap.get(sock);
     }
 
@@ -42,19 +43,20 @@ class ChatClient {
         return name;
     }
 
-    void sendMessage(String message){
+    public void sendMessage(String message) {
         sendData(message, DataType.Message);
     }
 
-    ChatRoom getChatRoom() {
+    public ChatRoom getChatRoom() {
         return currentChatRoom;
     }
 
-    void setChatRoom(ChatRoom chatRoom) {
+    public void setChatRoom(ChatRoom chatRoom) {
         this.currentChatRoom = chatRoom;
     }
 
-    void sendData(String data, DataType id){
+    @SuppressWarnings("Duplicates")
+    public void sendData(String data, DataType id) {
         try {
             outputStream.writeByte(id.byteValue);
             outputStream.writeUTF(data);

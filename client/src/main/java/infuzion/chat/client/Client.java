@@ -42,10 +42,20 @@ class Client implements Runnable {
         Client.controller = controller;
     }
 
-    public void sendMessage(String string) {
+    public void sendMessage(String message) {
+        if (message.startsWith("/")) {
+            sendData(message, DataType.Command);
+        } else {
+            sendData(message, DataType.Message);
+        }
+
+    }
+
+    @SuppressWarnings("Duplicates")
+    public void sendData(String data, DataType type) {
         try {
-            output.writeByte(DataType.Message.byteValue);
-            output.writeUTF(string);
+            output.writeByte(type.byteValue);
+            output.writeUTF(data);
             output.writeByte(DataType.EndOfData.byteValue);
         } catch (IOException e) {
             e.printStackTrace();

@@ -6,7 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-class ChatRoom {
+public class ChatRoom {
+    private static ChatRoomManager chatRoomManager;
     private final String name;
     private final UUID uuid;
     private List<ChatClient> clients = new LinkedList<>();
@@ -14,6 +15,14 @@ class ChatRoom {
     public ChatRoom(String name){
         this.name = name;
         this.uuid = UUID.randomUUID();
+    }
+
+    public static ChatRoomManager getChatRoomManager() {
+        return chatRoomManager;
+    }
+
+    static void setChatRoomManager(ChatRoomManager chatRoomManager) {
+        ChatRoom.chatRoomManager = chatRoomManager;
     }
 
     public String getName() {
