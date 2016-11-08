@@ -10,9 +10,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
-import sun.net.util.IPAddressUtil;
+import org.apache.commons.validator.routines.UrlValidator;
 
 import java.io.IOException;
 import java.net.URL;
@@ -20,6 +19,9 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
     private static Client client;
+    private static Stage primaryStage;
+    private static Scene scene;
+    private static Main main;
     @FXML
     private TextField username;
     @FXML
@@ -37,9 +39,6 @@ public class Controller implements Initializable {
     @FXML
     private TextField inputField;
     private Controller controller;
-    private Stage primaryStage;
-    private Scene scene;
-    private Main main;
 
 
     public Controller() {
@@ -48,6 +47,13 @@ public class Controller implements Initializable {
 
     public static void setClient(Client cl) {
         client = cl;
+    }
+
+    static void setStageAndSceneAndMain(Stage stage, Scene scene, Main main) {
+        primaryStage = stage;
+        Controller.scene = scene;
+        Controller.main = main;
+
     }
 
     /**
@@ -63,21 +69,22 @@ public class Controller implements Initializable {
 
     }
 
-    void setStageAndSceneAndMain(Stage stage, Scene scene, Main main) {
-        this.primaryStage = stage;
-        this.scene = scene;
-        this.main = main;
-
-    }
-
     @FXML
     private void submit() {
         try {
             String userNameValue = username.getText();
             int portValue = Integer.parseInt(port.getText());
-            if (!IPAddressUtil.isIPv4LiteralAddress(ip.getText())) {
+            UrlValidator urlValidator = new UrlValidator(UrlValidator.ALLOW_LOCAL_URLS + UrlValidator.ALLOW_ALL_SCHEMES) {
+                @Override
+                public boolean isValid(String string) {
+                    return super.isValid(string) || super.isValid("http://" + string);
+                }
+            };
+
+            if (!urlValidator.isValid(ip.getText())) {
                 throw new InvalidFormatException();
             }
+
             String ipValue = ip.getText();
             main.startClientThread(userNameValue, ipValue, portValue);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/mainChat.fxml"));
@@ -117,11 +124,6 @@ public class Controller implements Initializable {
     @FXML
     public void inputFieldAction(ActionEvent event) {
         chatButtonClicked();
-    }
-
-    @FXML
-    public void submitButtonAction(KeyEvent event) {
-        submit();
     }
 
     public void displayMessage(String string) {

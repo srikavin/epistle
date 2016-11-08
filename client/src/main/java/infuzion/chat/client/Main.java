@@ -37,11 +37,16 @@ public class Main extends Application{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/connectionOptions.fxml"));
         Parent root = loader.load();
         Scene scene = new Scene(root);
+        Controller controller = loader.getController();
+        Controller.setStageAndSceneAndMain(primaryStage, scene, this);
         primaryStage.setTitle("Connection Settings");
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
-        Controller controller = loader.getController();
-        controller.setStageAndSceneAndMain(primaryStage, scene, this);
+    }
+
+    @Override
+    public void stop() {
+        System.exit(0);
     }
 }

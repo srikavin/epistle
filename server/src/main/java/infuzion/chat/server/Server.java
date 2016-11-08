@@ -1,10 +1,12 @@
 package infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
-import infuzion.chat.server.command.Commands;
+import infuzion.chat.server.command.CommandManager;
+import infuzion.chat.server.plugin.PluginManager;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -19,6 +21,8 @@ public class Server implements Runnable {
     private List<DataOutputStream> clientOutput = new ArrayList<>();
     private Map<ChatClient, Integer> heartbeat = new HashMap<>();
     private ChatRoomManager chatRoomManager;
+    private PluginManager pluginManager = new PluginManager();
+    private CommandManager commandManager = new CommandManager();
 
     @SuppressWarnings("InfiniteLoopStatement")
     Server(int port) throws IOException {
@@ -58,6 +62,16 @@ public class Server implements Runnable {
                 }
             }
         }, 10, 1000);
+
+        try {
+            System.out.println(new File(".").getAbsoluteFile());
+            pluginManager.addAllPlugins(new File("plugins"));
+            pluginManager.load();
+            pluginManager.enable();
+            pluginManager.disable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -126,7 +140,9 @@ public class Server implements Runnable {
                             if (split.length > 1) {
                                 String command = split[0].replace("/", "");
                                 String[] args = Arrays.copyOfRange(split, 1, command.length());
-                                Commands.executeCommand(command, args, ChatClient.fromSocket(clientSockets.get(i)));
+                                commandManager.executeCommand(command, args, ChatClient.fromSocket(clientSockets.get(i)));
+                            } else {
+                                commandManager.executeCommand(message.replace("/", ""), new String[]{}, ChatClient.fromSocket(clientSockets.get(i)));
                             }
                         }
 
