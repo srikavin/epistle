@@ -1,30 +1,31 @@
-package infuzion.chat.server.plugin;
+package infuzion.chat.server.plugin.loader;
+
+import infuzion.chat.server.Server;
+import infuzion.chat.server.plugin.Plugin;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.jar.JarFile;
 
-public class PluginManager {
+public class PluginManager implements IPluginManager {
     private static List<Plugin> plugins = new ArrayList<>();
+    private Server server;
+
+    public PluginManager(Server server) {
+        this.server = server;
+    }
 
     public void addPlugin(File file) throws Exception {
         PluginDescriptionFile descriptionFile = new PluginDescriptionFile(new JarFile(file));
         ClassLoader loader = URLClassLoader.newInstance(new URL[]{file.toURI().toURL()});
-        Field f = ClassLoader.class.getDeclaredField("classes");
-        f.setAccessible(true);
 
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        Vector<Class> classes = (Vector<Class>) f.get(classLoader);
-        for (Class e : classes) {
-            System.out.println(e.getName());
-        }
-        System.out.println(descriptionFile.getMainClass());
         Plugin plugin = (Plugin) loader.loadClass(descriptionFile.getMainClass()).newInstance();
+        plugin.init(descriptionFile, server);
+        plugin.onLoad();
+        System.out.println("Successfully loaded " + descriptionFile.getName() + " v" + descriptionFile.getVersion());
         plugins.add(plugin);
     }
 
@@ -32,6 +33,7 @@ public class PluginManager {
         if (file == null || !file.isDirectory() || file.listFiles() == null) {
             return;
         }
+        //noinspection ConstantConditions
         for (File f : file.listFiles()) {
             try {
                 addPlugin(f);

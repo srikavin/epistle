@@ -1,16 +1,26 @@
 package infuzion.chat.server.plugin;
 
+import infuzion.chat.server.IServer;
 import infuzion.chat.server.command.CommandManager;
+import infuzion.chat.server.plugin.event.IEventManager;
 
 public abstract class Plugin {
     private boolean isEnabled;
-    private PluginDescriptionFile descriptionFile;
-
-    protected Plugin(Class<?> mainClass, PluginDescriptionFile descriptionFile) {
-        this.descriptionFile = descriptionFile;
-    }
+    private DescriptionFile descriptionFile;
+    private CommandManager commandManager;
+    private IEventManager IEventManager;
 
     public Plugin() {
+    }
+
+    public final void init(DescriptionFile descriptionFile, IServer server) {
+        this.descriptionFile = descriptionFile;
+        this.commandManager = server.getCommandManager();
+        this.IEventManager = server.getEventManager();
+    }
+
+    public final IEventManager getEventManager() {
+        return IEventManager;
     }
 
     public abstract void onEnable();
@@ -24,8 +34,8 @@ public abstract class Plugin {
         return false;
     }
 
-    public CommandManager getCommandManager() {
-        return new CommandManager();
+    protected CommandManager getCommandManager() {
+        return commandManager;
     }
 
     public final boolean isEnabled() {
@@ -36,7 +46,7 @@ public abstract class Plugin {
         this.isEnabled = enabled;
     }
 
-    public PluginDescriptionFile getDescriptionFile() {
+    public DescriptionFile getDescriptionFile() {
         return descriptionFile;
     }
 }

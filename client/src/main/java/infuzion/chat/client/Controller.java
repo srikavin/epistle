@@ -43,6 +43,7 @@ public class Controller implements Initializable {
 
     public Controller() {
         Client.setController(this);
+        Main.setController(this);
     }
 
     public static void setClient(Client cl) {
@@ -86,14 +87,8 @@ public class Controller implements Initializable {
             }
 
             String ipValue = ip.getText();
-            main.startClientThread(userNameValue, ipValue, portValue);
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mainChat.fxml"));
-            try {
-                Parent root = loader.load();
-                primaryStage.setScene(new Scene(root));
-                primaryStage.setTitle("Chat");
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (!connect(userNameValue, ipValue, portValue)) {
+                throw new InvalidFormatException("unable to connect");
             }
         } catch (NumberFormatException | InvalidFormatException e) {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/incorrectSettings.fxml"));
@@ -104,9 +99,26 @@ public class Controller implements Initializable {
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+        }
+    }
+
+    public boolean connect(String name, String ip, int port) {
+        try {
+            main.startClientThread(name, ip, port);
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/mainChat.fxml"));
+        try {
+            Parent root = loader.load();
+            primaryStage.setScene(new Scene(root));
+            primaryStage.setTitle("Chat");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     @FXML

@@ -32,7 +32,9 @@ class Client implements Runnable {
                     output.writeUTF("heart");
                     output.writeByte(DataType.EndOfData.byteValue);
                 } catch (IOException e) {
+                    this.cancel();
                     e.printStackTrace();
+                    disconnection();
                 }
             }
         }, 10, 5000);
@@ -40,6 +42,10 @@ class Client implements Runnable {
 
     public static void setController(Controller controller) {
         Client.controller = controller;
+    }
+
+    public void disconnection() {
+//        this
     }
 
     public void sendMessage(String message) {
@@ -59,6 +65,7 @@ class Client implements Runnable {
             output.writeByte(DataType.EndOfData.byteValue);
         } catch (IOException e) {
             e.printStackTrace();
+            disconnection();
         }
     }
 
@@ -88,6 +95,7 @@ class Client implements Runnable {
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
+            disconnection();
         }
     }
 }

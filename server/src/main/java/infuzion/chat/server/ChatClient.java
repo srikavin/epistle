@@ -10,14 +10,16 @@ import java.util.Map;
 import java.util.UUID;
 
 @SuppressWarnings("WeakerAccess")
-public class ChatClient {
-    private final static Map<Socket, ChatClient> clientSocketMap = new HashMap<>();
+public class ChatClient implements IChatClient {
+    private final static Map<Socket, IChatClient> clientSocketMap = new HashMap<>();
+    private final static Map<String, IChatClient> clientStringMap = new HashMap<>();
     private final String name;
     private final UUID uuid;
     private String prefix;
     private String color;
     private DataOutputStream outputStream;
-    private ChatRoom currentChatRoom;
+    private IChatRoom currentIChatRoom;
+    private Socket socket;
 
     public ChatClient(String name, UUID uuid, Socket socket) {
         this.name = name;
@@ -27,12 +29,30 @@ public class ChatClient {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        this.socket = socket;
         clientSocketMap.put(socket, this);
+        clientStringMap.put(name, this);
         prefix = "[" + name + "] ";
     }
 
-    public static ChatClient fromSocket(Socket sock) {
+    public static IChatClient fromSocket(Socket sock) {
         return clientSocketMap.get(sock);
+    }
+
+    public static IChatClient fromName(String name) {
+        return clientStringMap.get(name);
+    }
+
+    public void kick(String message) {
+        sendMessage(message);
+        clientSocketMap.remove(socket);
+        clientStringMap.remove(name);
+        try {
+            socket.shutdownInput();
+            socket.shutdownOutput();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public UUID getUuid() {
@@ -47,12 +67,12 @@ public class ChatClient {
         sendData(message, DataType.Message);
     }
 
-    public ChatRoom getChatRoom() {
-        return currentChatRoom;
+    public IChatRoom getChatRoom() {
+        return currentIChatRoom;
     }
 
-    public void setChatRoom(ChatRoom chatRoom) {
-        this.currentChatRoom = chatRoom;
+    public void setChatRoom(IChatRoom IChatRoom) {
+        this.currentIChatRoom = IChatRoom;
     }
 
     @SuppressWarnings("Duplicates")
@@ -72,6 +92,6 @@ public class ChatClient {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ChatClient && this.uuid.equals(((ChatClient) obj).getUuid());
+        return obj instanceof IChatClient && this.uuid.equals(((IChatClient) obj).getUuid());
     }
 }

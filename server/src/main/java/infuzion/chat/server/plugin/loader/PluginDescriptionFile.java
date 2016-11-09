@@ -1,6 +1,7 @@
-package infuzion.chat.server.plugin;
+package infuzion.chat.server.plugin.loader;
 
 import com.esotericsoftware.yamlbeans.YamlReader;
+import infuzion.chat.server.plugin.DescriptionFile;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -27,7 +28,6 @@ public class PluginDescriptionFile implements DescriptionFile {
         Reader reader = new InputStreamReader(jarFile.getInputStream(entry));
         YamlReader ymlReader = new YamlReader(reader);
         Object object = ymlReader.read();
-        System.out.println(object.getClass());
         Map map = (Map) object;
 
         name = (String) map.get("name");

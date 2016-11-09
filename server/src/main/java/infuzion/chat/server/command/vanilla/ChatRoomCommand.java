@@ -1,20 +1,20 @@
-package infuzion.chat.server.plugin.vanilla;
+package infuzion.chat.server.command.vanilla;
 
-import infuzion.chat.server.ChatClient;
 import infuzion.chat.server.ChatRoom;
-import infuzion.chat.server.ChatRoomManager;
-import infuzion.chat.server.plugin.ICommandExecutor;
+import infuzion.chat.server.IChatClient;
+import infuzion.chat.server.IChatRoomManager;
+import infuzion.chat.server.plugin.command.ICommandExecutor;
 
 public class ChatRoomCommand implements ICommandExecutor {
     @Override
-    public void onCommand(String commandName, String[] args, ChatClient client) {
-        if (args.length < 2) {
-            client.sendMessage(getPrefix() + "Invalid Usage!");
-            sendHelp(client);
-            return;
-        }
+    public void onCommand(String commandName, String[] args, IChatClient client) {
         if (commandName.equalsIgnoreCase("chatroom") || commandName.equalsIgnoreCase("cr")) {
-            ChatRoomManager roomManager = ChatRoom.getChatRoomManager();
+            if (args.length < 2) {
+                client.sendMessage(getPrefix() + "Invalid Usage!");
+                sendHelp(client);
+                return;
+            }
+            IChatRoomManager roomManager = ChatRoom.getChatRoomManager();
             if (args[0].equalsIgnoreCase("create")) {
                 if (args[1] != null) {
                     roomManager.addChatRoom(new ChatRoom(args[1]));
@@ -45,7 +45,7 @@ public class ChatRoomCommand implements ICommandExecutor {
         };
     }
 
-    private void sendHelp(ChatClient client) {
+    private void sendHelp(IChatClient client) {
         for (String e : getHelp()) {
             client.sendMessage(e);
         }

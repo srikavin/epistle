@@ -1,0 +1,26 @@
+package infuzion.chat.server.command.vanilla;
+
+import infuzion.chat.server.IChatClient;
+import infuzion.chat.server.Server;
+import infuzion.chat.server.plugin.command.ICommandExecutor;
+
+public class StopCommand implements ICommandExecutor {
+
+    private Server server;
+
+    public StopCommand(Server server) {
+        this.server = server;
+    }
+
+    @Override
+    public void onCommand(String commandName, String[] args, IChatClient client) {
+        if (commandName.equals("stop")) {
+            server.stop();
+        }
+    }
+
+    @Override
+    public String[] getHelp() {
+        return new String[0];
+    }
+}

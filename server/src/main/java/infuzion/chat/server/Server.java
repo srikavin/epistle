@@ -2,10 +2,14 @@ package infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
 import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.plugin.PluginManager;
+import infuzion.chat.server.plugin.event.EventManager;
+import infuzion.chat.server.plugin.event.IEventManager;
+import infuzion.chat.server.plugin.event.chat.MessageEvent;
+import infuzion.chat.server.plugin.event.command.PreCommandEvent;
+import infuzion.chat.server.plugin.loader.IPluginManager;
+import infuzion.chat.server.plugin.loader.PluginManager;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -13,29 +17,27 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
 
-public class Server implements Runnable {
+public class Server implements Runnable, IServer {
     private final List<DataInputStream> clientInput = new ArrayList<>();
     private ServerSocket socket;
-    private List<ChatClient> clients = new ArrayList<>();
     private List<Socket> clientSockets = new ArrayList<>();
-    private List<DataOutputStream> clientOutput = new ArrayList<>();
-    private Map<ChatClient, Integer> heartbeat = new HashMap<>();
-    private ChatRoomManager chatRoomManager;
-    private PluginManager pluginManager = new PluginManager();
-    private CommandManager commandManager = new CommandManager();
+    private Map<IChatClient, Integer> heartbeat = new HashMap<>();
+    private IChatRoomManager IChatRoomManager;
+    private IPluginManager IPluginManager = new PluginManager(this);
+    private CommandManager commandManager = new CommandManager(this);
+    private IEventManager IEventManager = new EventManager(this);
 
     @SuppressWarnings("InfiniteLoopStatement")
     Server(int port) throws IOException {
         System.out.println();
         socket = new ServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
         System.out.println("Binded to port " + socket.getLocalPort() + " at " + socket.getInetAddress().toString());
-        chatRoomManager = new ChatRoomManager();
+        IChatRoomManager = new ChatRoomManager();
         new Thread(() -> {
-            while(true) {
+            while (true) {
                 try {
                     Socket sock = socket.accept();
                     clientSockets.add(sock);
-                    clientOutput.add(new DataOutputStream(sock.getOutputStream()));
                     synchronized (clientInput) {
                         clientInput.add(new DataInputStream(sock.getInputStream()));
                     }
@@ -49,11 +51,12 @@ public class Server implements Runnable {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (Map.Entry<ChatClient, Integer> e : heartbeat.entrySet()) {
+                for (Iterator<Map.Entry<IChatClient, Integer>> iterator = heartbeat.entrySet().iterator(); iterator.hasNext(); ) {
+                    Map.Entry<IChatClient, Integer> e = iterator.next();
                     e.setValue(e.getValue() - 1000);
                     if (e.getValue() <= 0) {
-                        heartbeat.remove(e.getKey());
-                        chatRoomManager.removeClient(e.getKey());
+                        iterator.remove();
+                        IChatRoomManager.removeClient(e.getKey());
                         System.out.println("Removed client: ");
                         System.out.println("UUID: " + e.getKey().getUuid());
                         System.out.println("Name: " + e.getKey().getName());
@@ -65,26 +68,13 @@ public class Server implements Runnable {
 
         try {
             System.out.println(new File(".").getAbsoluteFile());
-            pluginManager.addAllPlugins(new File("plugins"));
-            pluginManager.load();
-            pluginManager.enable();
-            pluginManager.disable();
+            IPluginManager.addAllPlugins(new File("plugins"));
+            IPluginManager.enable();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * When an object implementing interface <code>Runnable</code> is used
-     * to create a thread, starting the thread causes the object's
-     * <code>run</code> method to be called in that separately executing
-     * thread.
-     * <p>
-     * The general contract of the method <code>run</code> is that it may
-     * take any action whatsoever.
-     *
-     * @see Thread#run()
-     */
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
@@ -110,17 +100,16 @@ public class Server implements Runnable {
 
                         if (mType.equals(DataType.Heartbeat)) {
                             if (message.equals("heart")) {
-                                ChatClient client = ChatClient.fromSocket(clientSockets.get(i));
+                                IChatClient client = ChatClient.fromSocket(clientSockets.get(i));
                                 client.sendData("beat", DataType.Heartbeat);
                                 heartbeat.replace(client, 10000);
                             }
                         }
                         if (mType.equals(DataType.ClientHello)) {
-                            ChatClient client = new ChatClient(message, UUID.randomUUID(), clientSockets.get(i));
+                            IChatClient client = new ChatClient(message, UUID.randomUUID(), clientSockets.get(i));
                             heartbeat.put(client, 10000);
-                            clients.add(client);
                             client.sendData(client.getUuid().toString(), DataType.UUIDAssign);
-                            chatRoomManager.addClient(client);
+                            IChatRoomManager.addClient(client);
 
                             System.out.println("Client connected: ");
                             System.out.println("UUID: " + client.getUuid());
@@ -128,30 +117,68 @@ public class Server implements Runnable {
                             System.out.println();
 
                         } else if (mType.equals(DataType.Message)) {
-                            ChatClient client = ChatClient.fromSocket(clientSockets.get(i));
+                            IChatClient client = ChatClient.fromSocket(clientSockets.get(i));
                             if (client == null) {
                                 continue;
                             }
-                            chatRoomManager.sendMessageAll(message, client, client.getChatRoom());
+                            MessageEvent messageEvent = new MessageEvent(client, message);
+                            IEventManager.fireEvent(messageEvent);
+                            if (messageEvent.isCanceled()) {
+                                continue;
+                            }
+                            IChatRoomManager.sendMessageAll(message, client, client.getChatRoom());
                             System.out.println(client.getPrefix() + message);
                         } else if (mType.equals(DataType.Command)) {
-                            System.out.println(message);
+                            IChatClient sender = ChatClient.fromSocket(clientSockets.get(i));
                             String[] split = message.split(" ");
+                            String command;
+                            String[] args;
                             if (split.length > 1) {
-                                String command = split[0].replace("/", "");
-                                String[] args = Arrays.copyOfRange(split, 1, command.length());
-                                commandManager.executeCommand(command, args, ChatClient.fromSocket(clientSockets.get(i)));
+                                command = split[0].replace("/", "");
+                                args = Arrays.copyOfRange(split, 1, split.length);
                             } else {
-                                commandManager.executeCommand(message.replace("/", ""), new String[]{}, ChatClient.fromSocket(clientSockets.get(i)));
+                                command = message.replace("/", "");
+                                args = new String[]{};
                             }
+                            PreCommandEvent event = new PreCommandEvent(command, args, sender);
+                            IEventManager.fireEvent(event);
+                            if (event.isCanceled()) {
+                                continue;
+                            }
+                            System.out.println(sender.getName() + " executed: " + message);
+                            commandManager.executeCommand(command, args, sender);
                         }
-
                     }
+
                 }
                 Thread.sleep(250);
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void reload() {
+        IPluginManager.disable();
+        IPluginManager.addAllPlugins(new File("plugins"));
+        IPluginManager.load();
+        IPluginManager.enable();
+    }
+
+    public void stop() {
+        IPluginManager.disable();
+        System.exit(0);
+    }
+
+    public IPluginManager getPluginManager() {
+        return IPluginManager;
+    }
+
+    public IEventManager getEventManager() {
+        return IEventManager;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 }

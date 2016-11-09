@@ -10,4 +10,13 @@ public class Command {
     public String getName() {
         return name;
     }
+
+    public boolean equals(Object o) {
+        if (o instanceof Command) {
+            if (((Command) o).getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
