@@ -74,4 +74,8 @@ public class EventManager implements IEventManager {
             }
         }
     }
+
+    public void reset() {
+        Event.removeAllHandlers();
+    }
 }

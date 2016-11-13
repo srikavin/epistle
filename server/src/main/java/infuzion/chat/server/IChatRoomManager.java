@@ -11,7 +11,7 @@ public interface IChatRoomManager {
 
     IChatRoom fromString(String string);
 
-    void sendMessageAll(String message, ChatClient client);
+    void sendMessageAll(String message, IChatClient client);
 
     void sendMessageAll(String message, IChatClient client, IChatRoom IChatRoom);
 

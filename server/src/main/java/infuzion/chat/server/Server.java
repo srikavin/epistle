@@ -6,6 +6,7 @@ import infuzion.chat.server.plugin.event.EventManager;
 import infuzion.chat.server.plugin.event.IEventManager;
 import infuzion.chat.server.plugin.event.chat.MessageEvent;
 import infuzion.chat.server.plugin.event.command.PreCommandEvent;
+import infuzion.chat.server.plugin.event.connection.JoinEvent;
 import infuzion.chat.server.plugin.loader.IPluginManager;
 import infuzion.chat.server.plugin.loader.PluginManager;
 
@@ -16,23 +17,31 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Server implements Runnable, IServer {
     private final List<DataInputStream> clientInput = new ArrayList<>();
     private ServerSocket socket;
     private List<Socket> clientSockets = new ArrayList<>();
     private Map<IChatClient, Integer> heartbeat = new HashMap<>();
-    private IChatRoomManager IChatRoomManager;
-    private IPluginManager IPluginManager = new PluginManager(this);
-    private CommandManager commandManager = new CommandManager(this);
-    private IEventManager IEventManager = new EventManager(this);
+    private IChatRoomManager chatRoomManager;
+    private IPluginManager pluginManager;
+    private CommandManager commandManager;
+    private IEventManager eventManager;
+    private int tps = 20;
+    private long tpsTotal = 0;
+    private long tpsCounter = 0;
 
     @SuppressWarnings("InfiniteLoopStatement")
     Server(int port) throws IOException {
-        System.out.println();
         socket = new ServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
         System.out.println("Binded to port " + socket.getLocalPort() + " at " + socket.getInetAddress().toString());
-        IChatRoomManager = new ChatRoomManager();
+
+        chatRoomManager = new ChatRoomManager();
+        pluginManager = new PluginManager(this);
+        commandManager = new CommandManager(this);
+        eventManager = new EventManager(this);
+
         new Thread(() -> {
             while (true) {
                 try {
@@ -56,7 +65,7 @@ public class Server implements Runnable, IServer {
                     e.setValue(e.getValue() - 1000);
                     if (e.getValue() <= 0) {
                         iterator.remove();
-                        IChatRoomManager.removeClient(e.getKey());
+                        chatRoomManager.removeClient(e.getKey());
                         System.out.println("Removed client: ");
                         System.out.println("UUID: " + e.getKey().getUuid());
                         System.out.println("Name: " + e.getKey().getName());
@@ -66,13 +75,7 @@ public class Server implements Runnable, IServer {
             }
         }, 10, 1000);
 
-        try {
-            System.out.println(new File(".").getAbsoluteFile());
-            IPluginManager.addAllPlugins(new File("plugins"));
-            IPluginManager.enable();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        reload();
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
@@ -80,21 +83,20 @@ public class Server implements Runnable, IServer {
     public void run() {
         try {
             while (true) {
+                long curTime = System.currentTimeMillis();
                 synchronized (clientInput) {
                     for (int i = 0, clientInputSize = clientInput.size(); i < clientInputSize; i++) {
                         DataInputStream e = clientInput.get(i);
                         if (e.available() <= 0) {
                             continue;
                         }
+
                         byte messageType = e.readByte();
+                        DataType mType = DataType.valueOf(messageType);
                         String message = e.readUTF();
                         byte end = e.readByte();
 
-                        if (end != DataType.EndOfData.byteValue) {
-                            continue;
-                        }
-                        DataType mType = DataType.valueOf(messageType);
-                        if (mType == null) {
+                        if (end != DataType.EndOfData.byteValue || mType == null) {
                             continue;
                         }
 
@@ -107,9 +109,14 @@ public class Server implements Runnable, IServer {
                         }
                         if (mType.equals(DataType.ClientHello)) {
                             IChatClient client = new ChatClient(message, UUID.randomUUID(), clientSockets.get(i));
+                            JoinEvent joinEvent = new JoinEvent(client);
+                            eventManager.fireEvent(joinEvent);
+                            if (joinEvent.isCanceled()) {
+                                client.sendData("You were kicked.", DataType.Kick);
+                                continue;
+                            }
                             heartbeat.put(client, 10000);
-                            client.sendData(client.getUuid().toString(), DataType.UUIDAssign);
-                            IChatRoomManager.addClient(client);
+                            chatRoomManager.addClient(client);
 
                             System.out.println("Client connected: ");
                             System.out.println("UUID: " + client.getUuid());
@@ -122,11 +129,11 @@ public class Server implements Runnable, IServer {
                                 continue;
                             }
                             MessageEvent messageEvent = new MessageEvent(client, message);
-                            IEventManager.fireEvent(messageEvent);
+                            eventManager.fireEvent(messageEvent);
                             if (messageEvent.isCanceled()) {
                                 continue;
                             }
-                            IChatRoomManager.sendMessageAll(message, client, client.getChatRoom());
+                            chatRoomManager.sendMessageAll(message, client, client.getChatRoom());
                             System.out.println(client.getPrefix() + message);
                         } else if (mType.equals(DataType.Command)) {
                             IChatClient sender = ChatClient.fromSocket(clientSockets.get(i));
@@ -141,7 +148,7 @@ public class Server implements Runnable, IServer {
                                 args = new String[]{};
                             }
                             PreCommandEvent event = new PreCommandEvent(command, args, sender);
-                            IEventManager.fireEvent(event);
+                            eventManager.fireEvent(event);
                             if (event.isCanceled()) {
                                 continue;
                             }
@@ -149,9 +156,14 @@ public class Server implements Runnable, IServer {
                             commandManager.executeCommand(command, args, sender);
                         }
                     }
-
                 }
-                Thread.sleep(250);
+                while (curTime + 50 > System.currentTimeMillis()) {
+                    long toSleep = (curTime + 50) - System.currentTimeMillis();
+                    tpsTotal += toSleep;
+                    tpsCounter++;
+                    tps = 1000 / Math.toIntExact(tpsTotal / tpsCounter);
+                    TimeUnit.MILLISECONDS.sleep(toSleep);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -159,26 +171,44 @@ public class Server implements Runnable, IServer {
     }
 
     public void reload() {
-        IPluginManager.disable();
-        IPluginManager.addAllPlugins(new File("plugins"));
-        IPluginManager.load();
-        IPluginManager.enable();
+        pluginManager.disable();
+        try {
+            File file = new File("plugins");
+            //noinspection ResultOfMethodCallIgnored
+            file.mkdir();
+            pluginManager = new PluginManager(this);
+            commandManager = new CommandManager(this);
+            eventManager.reset();
+            pluginManager.addAllPlugins(file);
+            pluginManager.enable();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void stop() {
-        IPluginManager.disable();
+        pluginManager.disable();
         System.exit(0);
     }
 
     public IPluginManager getPluginManager() {
-        return IPluginManager;
+        return pluginManager;
     }
 
     public IEventManager getEventManager() {
-        return IEventManager;
+        return eventManager;
     }
 
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public int getTps() {
+        return tps;
+    }
+
+    @Override
+    public long getTotalTps() {
+        return tpsTotal;
     }
 }

@@ -2,10 +2,7 @@ package infuzion.chat.server.command;
 
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.Server;
-import infuzion.chat.server.command.vanilla.ChatRoomCommand;
-import infuzion.chat.server.command.vanilla.ModeratorCommand;
-import infuzion.chat.server.command.vanilla.ReloadCommand;
-import infuzion.chat.server.command.vanilla.StopCommand;
+import infuzion.chat.server.command.vanilla.*;
 import infuzion.chat.server.plugin.command.ICommandExecutor;
 
 import java.util.ArrayList;
@@ -14,14 +11,15 @@ import java.util.List;
 import java.util.Map;
 
 public class CommandManager {
-    private static List<ICommandExecutor> vanillaCommandExecutors = new ArrayList<>();
-    private static Map<Command, ICommandExecutor> pluginCommandExecutors = new HashMap<>();
+    private List<ICommandExecutor> vanillaCommandExecutors = new ArrayList<>();
+    private Map<Command, ICommandExecutor> pluginCommandExecutors = new HashMap<>();
 
     public CommandManager(Server server) {
         addCommandExecutor(new ChatRoomCommand());
         addCommandExecutor(new ModeratorCommand());
         addCommandExecutor(new ReloadCommand(server));
         addCommandExecutor(new StopCommand(server));
+        addCommandExecutor(new TpsCommand(server));
     }
 
     public void registerCommand(Command command, ICommandExecutor executor) {

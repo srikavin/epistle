@@ -1,12 +1,14 @@
 package infuzion.chat.server.plugin.event.command;
 
 import infuzion.chat.server.IChatClient;
-import infuzion.chat.server.plugin.event.CancelableEvent;
+import infuzion.chat.server.plugin.event.Cancelable;
+import infuzion.chat.server.plugin.event.Event;
 
-public class CommandEvent extends CancelableEvent {
+public class CommandEvent extends Event implements Cancelable {
     private String command;
     private String[] args;
     private IChatClient sender;
+    private boolean canceled = false;
 
     public CommandEvent(String command, String[] args, IChatClient sender) {
         this.command = command;
@@ -32,5 +34,15 @@ public class CommandEvent extends CancelableEvent {
 
     public IChatClient getSender() {
         return sender;
+    }
+
+    @Override
+    public boolean isCanceled() {
+        return canceled;
+    }
+
+    @Override
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
     }
 }

@@ -19,10 +19,10 @@ public class ModeratorCommand implements ICommandExecutor {
                 if (args.length >= 2) {
                     String message = "";
                     for (int i = 1; i < args.length - 1; i++) {
-                        message += args[i];
+                        message += " " + args[i];
                     }
-                    client.sendMessage("You kicked " + toKick.getName() + " for " + message);
-                    ChatRoom.getChatRoomManager().kickClient(toKick, message);
+                    client.sendMessage("You kicked " + toKick.getName().trim() + " for " + message.trim());
+                    ChatRoom.getChatRoomManager().kickClient(toKick, message.trim());
                 }
                 ChatRoom.getChatRoomManager().kickClient(toKick);
             } else {

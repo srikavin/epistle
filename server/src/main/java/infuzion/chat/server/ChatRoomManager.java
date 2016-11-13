@@ -51,7 +51,7 @@ public class ChatRoomManager implements IChatRoomManager {
     }
 
     @Override
-    public void sendMessageAll(String message, ChatClient client) {
+    public void sendMessageAll(String message, IChatClient client) {
         for (IChatRoom e : IChatRooms) {
             sendMessageAll(message, client, e);
         }

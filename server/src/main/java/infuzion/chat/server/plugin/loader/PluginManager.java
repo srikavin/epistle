@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.jar.JarFile;
 
 public class PluginManager implements IPluginManager {
-    private static List<Plugin> plugins = new ArrayList<>();
+    private List<Plugin> plugins = new ArrayList<>();
     private Server server;
 
     public PluginManager(Server server) {
@@ -58,5 +58,4 @@ public class PluginManager implements IPluginManager {
     public void disable() {
         plugins.forEach(Plugin::onDisable);
     }
-
 }

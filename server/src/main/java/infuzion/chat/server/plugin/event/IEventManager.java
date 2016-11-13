@@ -8,4 +8,6 @@ public interface IEventManager {
     void registerEvents(IEventListener listener, Plugin plugin);
 
     void fireEvent(Event event);
+
+    void reset();
 }

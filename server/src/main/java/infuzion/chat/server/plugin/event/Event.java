@@ -12,8 +12,11 @@ public abstract class Event {
     }
 
     public static List<Listener> getAllHandlers() {
-
         return new HandlerList().getAllListeners();
+    }
+
+    public static void removeAllHandlers() {
+        new HandlerList().reset();
     }
 
 //    abstract HandlerList getHandlers();

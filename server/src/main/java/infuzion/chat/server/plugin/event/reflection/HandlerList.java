@@ -18,4 +18,9 @@ public class HandlerList {
     public List<Listener> getAllListeners() {
         return allListeners;
     }
+
+    public void reset() {
+        allListeners = new ArrayList<>();
+        handlers = new ArrayList<>();
+    }
 }

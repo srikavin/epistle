@@ -16,7 +16,6 @@ public class ChatClient implements IChatClient {
     private final String name;
     private final UUID uuid;
     private String prefix;
-    private String color;
     private DataOutputStream outputStream;
     private IChatRoom currentIChatRoom;
     private Socket socket;
@@ -89,6 +88,7 @@ public class ChatClient implements IChatClient {
     public String getPrefix() {
         return prefix;
     }
+
 
     @Override
     public boolean equals(Object obj) {

@@ -15,4 +15,7 @@ public interface IServer {
 
     CommandManager getCommandManager();
 
+    int getTps();
+
+    long getTotalTps();
 }

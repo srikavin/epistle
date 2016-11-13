@@ -13,7 +13,7 @@ public class Command {
 
     public boolean equals(Object o) {
         if (o instanceof Command) {
-            if (((Command) o).getName().equals(name)) {
+            if (((Command) o).getName().equalsIgnoreCase(name)) {
                 return true;
             }
         }
