@@ -5,9 +5,9 @@ public enum DataType {
     EndOfData((byte) 0x2),
     ColorChange((byte) 0x3),
     ClientHello((byte) 0x4),
-    UUIDAssign((byte) 0x5),
-    Heartbeat((byte) 0x6),
-    Command((byte) 0x7);
+    Heartbeat((byte) 0x5),
+    Command((byte) 0x6),
+    Kick((byte) 0x7);
 
     public byte byteValue;
     DataType(byte i) {
