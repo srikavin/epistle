@@ -1,0 +1,17 @@
+.blue {
+    -fx-color: blue;
+}
+
+.green {
+    -fx-color: green;
+}
+
+.red {
+    -fx-color: red;
+}
+
+* {
+    fx-line-height: 1.1;
+    -fx-font-size: 14px;
+    /*-fx-font-family: monospace;*/
+}

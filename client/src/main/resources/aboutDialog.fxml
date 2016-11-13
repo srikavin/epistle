@@ -6,9 +6,8 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <GridPane xmlns:fx="http://javafx.com/fxml/1" hgap="14.0" maxHeight="+Infinity" maxWidth="+Infinity"
-          minHeight="-Infinity" minWidth="-Infinity"
-          vgap="20.0" xmlns="http://javafx.com/javafx/8.0.60"
-          fx:controller="infuzion.chat.client.controller.IncorrectSettingsController">
+          minHeight="-Infinity" minWidth="-Infinity" vgap="20.0" xmlns="http://javafx.com/javafx/8.0.60"
+          fx:controller="infuzion.chat.client.controller.AboutDialogController">
     <columnConstraints>
         <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity"/>
         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="+Infinity" minWidth="-Infinity"/>
@@ -22,12 +21,12 @@
     </rowConstraints>
     <VBox maxHeight="+Infinity" maxWidth="+Infinity" minHeight="-Infinity" prefWidth="400.0" spacing="7.0"
           GridPane.columnIndex="1" GridPane.rowIndex="0">
-        <Label text="Incorrect Connection Settings" wrapText="true">
+        <Label fx:id="messageLabel" text="Chat v2.0" wrapText="true">
             <font>
                 <Font name="System Bold" size="13.0"/>
             </font>
         </Label>
-        <Label text="Verify your settings and try again." wrapText="true">
+        <Label fx:id="detailsLabel" text="Made by Infuzion" wrapText="true">
             <font>
                 <Font size="12.0"/>
             </font>
@@ -35,14 +34,14 @@
     </VBox>
     <HBox maxHeight="-Infinity" maxWidth="+Infinity" minHeight="-Infinity" minWidth="-Infinity" GridPane.columnIndex="1"
           GridPane.rowIndex="1">
-        <HBox alignment="CENTER">
+        <HBox fx:id="actionParent" alignment="CENTER">
             <HBox.margin>
                 <Insets/>
             </HBox.margin>
         </HBox>
         <Pane maxWidth="+Infinity" HBox.hgrow="ALWAYS"/>
-        <HBox alignment="CENTER">
-            <Button minWidth="80.0" mnemonicParsing="false" onAction="#close" text="Ok"
+        <HBox fx:id="okParent" alignment="CENTER">
+            <Button fx:id="okButton" minWidth="80.0" mnemonicParsing="false" onAction="#close" text="Ok"
                     HBox.hgrow="NEVER">
                 <HBox.margin>
                     <Insets left="14.0"/>

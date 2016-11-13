@@ -1,6 +1,29 @@
+/*
+ *  Copyright DateInfo.year Infuzion
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
 package infuzion.chat.client;
 
+import infuzion.chat.client.controller.DisconnectDialogController;
+import infuzion.chat.client.controller.MainChatController;
 import infuzion.chat.common.DataType;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,11 +31,13 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
 
-class Client implements Runnable {
-    private static Controller controller;
+public class Client implements Runnable {
     private DataInputStream input;
     private DataOutputStream output;
     private Map<UUID, String> uuidStringMap = new HashMap<>();
+    private volatile boolean disconnected = false;
+    private volatile boolean disconnectHandled = false;
+    private Timer heartbeat;
 
     Client(String ip, int port, String username) throws IOException {
         Socket sock = new Socket(ip, port);
@@ -21,9 +46,8 @@ class Client implements Runnable {
         output.writeByte(DataType.ClientHello.byteValue);
         output.writeUTF(username);
         output.writeByte(DataType.EndOfData.byteValue);
-        Controller.setClient(this);
 
-        Timer heartbeat = new Timer();
+        heartbeat = new Timer();
         heartbeat.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -34,18 +58,41 @@ class Client implements Runnable {
                 } catch (IOException e) {
                     this.cancel();
                     e.printStackTrace();
-                    disconnection();
+                    disconnection(e);
                 }
             }
         }, 10, 5000);
+        heartbeat.cancel();
     }
 
-    public static void setController(Controller controller) {
-        Client.controller = controller;
-    }
-
-    public void disconnection() {
-//        this
+    private void disconnection(Throwable throwable) {
+        if (!Platform.isFxApplicationThread()) {
+            if (disconnected) {
+                return;
+            }
+            disconnected = true;
+            Platform.runLater(() -> disconnection(throwable));
+            return;
+        }
+        try {
+            if (disconnectHandled) {
+                return;
+            }
+            disconnectHandled = true;
+            heartbeat.cancel();
+            input.close();
+            output.close();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/disconnectDialog.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            scene.setFill(Color.TRANSPARENT);
+            stage.setScene(scene);
+            DisconnectDialogController disconnectDialogController = loader.getController();
+            disconnectDialogController.setStage(stage);
+            disconnectDialogController.show(throwable);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendMessage(String message) {
@@ -65,7 +112,7 @@ class Client implements Runnable {
             output.writeByte(DataType.EndOfData.byteValue);
         } catch (IOException e) {
             e.printStackTrace();
-            disconnection();
+            disconnection(e);
         }
     }
 
@@ -89,13 +136,13 @@ class Client implements Runnable {
 
                 if (mType.equals(DataType.Message)) {
                     System.out.println(message);
-                    controller.displayMessage(message + "\n");
+                    MainChatController.displayMessage(message + "\n");
                 }
-                Thread.sleep(250);
+                Thread.sleep(50);
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
-            disconnection();
+            disconnection(e);
         }
     }
 }
