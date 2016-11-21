@@ -18,6 +18,8 @@ package infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
 import infuzion.chat.server.command.CommandManager;
+import infuzion.chat.server.permission.IPermissionManager;
+import infuzion.chat.server.permission.def.DefaultPermissionManager;
 import infuzion.chat.server.plugin.event.EventManager;
 import infuzion.chat.server.plugin.event.IEventManager;
 import infuzion.chat.server.plugin.event.chat.MessageEvent;
@@ -43,6 +45,7 @@ public class Server implements Runnable, IServer {
     private IPluginManager pluginManager;
     private CommandManager commandManager;
     private IEventManager eventManager;
+    private IPermissionManager permissionManager;
     private int tps = 20;
     private long tpsTotal = 0;
     private long tpsCounter = 0;
@@ -225,6 +228,7 @@ public class Server implements Runnable, IServer {
             file.mkdir();
             pluginManager = new PluginManager(this);
             commandManager = new CommandManager(this);
+            permissionManager = new DefaultPermissionManager();
             eventManager.reset();
             pluginManager.addAllPlugins(file);
             pluginManager.enable();
@@ -248,6 +252,11 @@ public class Server implements Runnable, IServer {
 
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    @Override
+    public IPermissionManager getPermissionManager() {
+        return permissionManager;
     }
 
     public int getTps() {

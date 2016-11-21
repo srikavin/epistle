@@ -14,27 +14,17 @@
  *    limitations under the License.
  */
 
-package infuzion.chat.server;
+package infuzion.chat.server.permission;
 
-import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.event.IEventManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+public enum PermissionDefault {
+    FALSE((byte) 0),
+    TRUE((byte) 1);
 
-public interface IServer {
-    void reload();
+    byte id;
 
-    void stop();
-
-    IPluginManager getPluginManager();
-
-    IEventManager getEventManager();
-
-    CommandManager getCommandManager();
-
-    IPermissionManager getPermissionManager();
-
-    int getTps();
-
-    long getTotalTps();
+    PermissionDefault(byte b) {
+        id = b;
+    }
 }
+
+

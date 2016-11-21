@@ -17,6 +17,7 @@
 package infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
+import infuzion.chat.server.permission.PermissionAttachment;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,6 +32,8 @@ public class ChatClient implements IChatClient {
     private final static Map<String, IChatClient> clientStringMap = new HashMap<>();
     private final String name;
     private final UUID uuid;
+
+    private PermissionAttachment permissionAttachment;
     private String prefix;
     private DataOutputStream outputStream;
     private IChatRoom currentIChatRoom;
@@ -105,9 +108,26 @@ public class ChatClient implements IChatClient {
         return prefix;
     }
 
+    @Override
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
 
     @Override
     public boolean equals(Object obj) {
         return obj instanceof IChatClient && this.uuid.equals(((IChatClient) obj).getUuid());
+    }
+
+    public PermissionAttachment getPermissionAttachment() {
+        return permissionAttachment;
+    }
+
+    public void setPermissionAttachment(PermissionAttachment permissionAttachment) {
+        this.permissionAttachment = permissionAttachment;
+    }
+
+    @Override
+    public boolean isConsole() {
+        return false;
     }
 }
