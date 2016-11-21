@@ -27,6 +27,8 @@
     <modules>
         <module>common</module>
         <module>testPlugin</module>
+        <module>client</module>
+        <module>permissionPlugin</module>
     </modules>
     <build>
         <plugins>
