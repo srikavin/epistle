@@ -16,21 +16,25 @@
 
 package infuzion.chat.server.permission;
 
-import infuzion.chat.server.ChatClient;
+import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.command.Command;
 
 public interface IPermissionManager {
-    default boolean hasPermission(String permission, ChatClient chatClient) {
+    default boolean hasPermission(String permission, IChatClient chatClient) {
         return hasPermission(new Permission(permission), chatClient);
     }
 
-    boolean hasPermission(Permission permission, ChatClient chatClient);
+    boolean hasPermission(Permission permission, IChatClient chatClient);
 
-    PermissionAttachment getPermissions(ChatClient client);
+    PermissionAttachment getPermissions(IChatClient client);
 
     void registerPermission(Command command, Permission permission);
 
-    PermissionAttachment getPermissionAttachment(ChatClient chatClient);
+    default void registerPermission(String command, String permission) {
+        registerPermission(new Command(command), new Permission(permission));
+    }
+
+    PermissionAttachment getPermissionAttachment(IChatClient chatClient);
 
     default String noPermissionMessage() {
         return "Sorry, you are not allowed to perform that action.";

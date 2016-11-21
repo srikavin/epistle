@@ -17,6 +17,7 @@
 package infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
+import infuzion.chat.server.permission.PermissionAttachment;
 
 import java.util.UUID;
 
@@ -38,6 +39,10 @@ public interface IChatClient {
     String getPrefix();
 
     void setPrefix(String prefix);
+
+    PermissionAttachment getPermissionAttachment();
+
+    void setPermissionAttachment(PermissionAttachment attachment);
 
     boolean isConsole();
 }

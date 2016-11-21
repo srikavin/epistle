@@ -68,13 +68,15 @@ public class test extends Plugin implements ICommandExecutor, IEventListener {
     }
 
     @EventHandler
-    public void onCommand(PreCommandEvent event) {
-        event.setCanceled(false);
-        event.getSender().sendMessage("You issued the command " + event.getCommand());
+    public void onCommandEvent(PreCommandEvent event) {
+        if (!event.isCanceled()) {
+            event.getSender().sendMessage("You issued the command " + event.getCommand());
+        }
     }
 
     @EventHandler
     public void onJoin(JoinEvent event) {
-        event.setCanceled(true);
+        event.getClient().sendMessage("you joined! Welcome");
+        System.out.println("you joined! Welcome");
     }
 }

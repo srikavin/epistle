@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Represents permissions attached to a {@link infuzion.chat.server.IChatClient ChatClient}
  */
-public class PermissionAttachment implements Iterable {
+public class PermissionAttachment implements Iterable<Permission> {
     private List<Permission> permissions;
 
     /**

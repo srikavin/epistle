@@ -61,8 +61,11 @@ public class Server implements Runnable, IServer {
 
         chatRoomManager = new ChatRoomManager();
         pluginManager = new PluginManager(this);
-        commandManager = new CommandManager(this);
         eventManager = new EventManager(this);
+        permissionManager = new DefaultPermissionManager(this);
+
+        //Init this last
+        commandManager = new CommandManager(this);
 
         new Thread(() -> {
             while (true) {
@@ -227,9 +230,10 @@ public class Server implements Runnable, IServer {
             //noinspection ResultOfMethodCallIgnored
             file.mkdir();
             pluginManager = new PluginManager(this);
-            commandManager = new CommandManager(this);
-            permissionManager = new DefaultPermissionManager();
             eventManager.reset();
+            permissionManager = new DefaultPermissionManager(this);
+            //Init this last
+            commandManager = new CommandManager(this);
             pluginManager.addAllPlugins(file);
             pluginManager.enable();
         } catch (Exception e) {

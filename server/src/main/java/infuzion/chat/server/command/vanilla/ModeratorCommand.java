@@ -19,9 +19,18 @@ package infuzion.chat.server.command.vanilla;
 import infuzion.chat.server.ChatClient;
 import infuzion.chat.server.ChatRoom;
 import infuzion.chat.server.IChatClient;
+import infuzion.chat.server.IServer;
+import infuzion.chat.server.permission.IPermissionManager;
 import infuzion.chat.server.plugin.command.ICommandExecutor;
 
 public class ModeratorCommand implements ICommandExecutor {
+
+    public ModeratorCommand(IServer server) {
+        IPermissionManager permissionManager = server.getPermissionManager();
+        permissionManager.registerPermission("kick", "chat.kick");
+        permissionManager.registerPermission("ban", "chat.ban");
+        permissionManager.registerPermission("mute", "chat.mute");
+    }
 
     @Override
     public void onCommand(String commandName, String[] args, IChatClient client) {

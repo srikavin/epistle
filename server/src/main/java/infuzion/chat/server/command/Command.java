@@ -27,6 +27,7 @@ public class Command {
         return name;
     }
 
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Command) {
             if (((Command) o).getName().equalsIgnoreCase(name)) {
@@ -34,5 +35,15 @@ public class Command {
             }
         }
         return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

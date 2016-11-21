@@ -44,7 +44,7 @@ public class EventManager implements IEventManager {
         registerEvents(PreCommandEvent.class);
     }
 
-    public void registerEvents(Class event) {
+    public void registerEvents(Class<? extends Event> event) {
         if (Event.class.isAssignableFrom(event) && !eventTypes.contains(event)) {
             eventTypes.add(event);
         }

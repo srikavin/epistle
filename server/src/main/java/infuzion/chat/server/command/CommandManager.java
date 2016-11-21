@@ -34,7 +34,7 @@ public class CommandManager {
 
     public CommandManager(Server server) {
         addCommandExecutor(new ChatRoomCommand());
-        addCommandExecutor(new ModeratorCommand());
+        addCommandExecutor(new ModeratorCommand(server));
         addCommandExecutor(new ReloadCommand(server));
         addCommandExecutor(new StopCommand(server));
         addCommandExecutor(new TpsCommand(server));

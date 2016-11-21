@@ -21,8 +21,7 @@ public class Permission {
     private PermissionDefault type;
 
     public Permission(String permission) {
-        this.permission = permission;
-        type = PermissionDefault.FALSE;
+        this(permission, PermissionDefault.FALSE);
     }
 
     public Permission(String permission, PermissionDefault defaultType) {
