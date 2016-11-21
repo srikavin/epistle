@@ -36,4 +36,8 @@ public interface IChatClient {
     void sendData(String data, DataType id);
 
     String getPrefix();
+
+    void setPrefix(String prefix);
+
+    boolean isConsole();
 }

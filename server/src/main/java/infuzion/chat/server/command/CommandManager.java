@@ -20,6 +20,8 @@ import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.Server;
 import infuzion.chat.server.command.vanilla.*;
 import infuzion.chat.server.plugin.command.ICommandExecutor;
+import infuzion.chat.server.plugin.event.IEventManager;
+import infuzion.chat.server.plugin.event.command.PreCommandEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,14 +52,16 @@ public class CommandManager {
         vanillaCommandExecutors.add(executor);
     }
 
-    public void executeCommand(String command, String[] args, IChatClient client) {
+    public void executeCommand(String command, String[] args, IChatClient client, IEventManager eventManager) {
+        PreCommandEvent event = new PreCommandEvent(command, args, client);
+        eventManager.fireEvent(event);
+        if (event.isCanceled()) {
+            return;
+        }
+        System.out.println(client.getName() + " executed: " + command);
         for (ICommandExecutor executor : vanillaCommandExecutors) {
             executor.onCommand(command, args, client);
         }
-        for (Map.Entry<Command, ICommandExecutor> e : pluginCommandExecutors.entrySet()) {
-            if (e.getKey().equals(new Command(command))) {
-                e.getValue().onCommand(command, args, client);
-            }
-        }
+        pluginCommandExecutors.entrySet().stream().filter(e -> e.getKey().equals(new Command(command))).forEach(e -> e.getValue().onCommand(command, args, client));
     }
 }

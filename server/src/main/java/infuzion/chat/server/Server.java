@@ -21,7 +21,6 @@ import infuzion.chat.server.command.CommandManager;
 import infuzion.chat.server.plugin.event.EventManager;
 import infuzion.chat.server.plugin.event.IEventManager;
 import infuzion.chat.server.plugin.event.chat.MessageEvent;
-import infuzion.chat.server.plugin.event.command.PreCommandEvent;
 import infuzion.chat.server.plugin.event.connection.JoinEvent;
 import infuzion.chat.server.plugin.loader.IPluginManager;
 import infuzion.chat.server.plugin.loader.PluginManager;
@@ -47,9 +46,13 @@ public class Server implements Runnable, IServer {
     private int tps = 20;
     private long tpsTotal = 0;
     private long tpsCounter = 0;
+    private IChatClient serverClient = new ServerChatClient();
+    private Scanner scanner;
+    private volatile List<Runnable> toRun = new ArrayList<>();
 
     @SuppressWarnings("InfiniteLoopStatement")
     Server(int port) throws IOException {
+        scanner = new Scanner(System.in);
         socket = new ServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
         System.out.println("Binded to port " + socket.getLocalPort() + " at " + socket.getInetAddress().toString());
 
@@ -92,6 +95,32 @@ public class Server implements Runnable, IServer {
         }, 10, 1000);
 
         reload();
+
+        new Thread() {
+            public void run() {
+                while (true) {
+                    if (scanner.hasNext()) {
+                        String input = scanner.nextLine();
+                        String[] split = input.split(" ");
+                        String[] args;
+                        String command;
+                        if (split.length > 1) {
+                            command = split[0];
+                            args = Arrays.copyOfRange(split, 1, split.length);
+                        } else {
+                            command = input;
+                            args = new String[]{};
+                        }
+                        toRun.add(() -> commandManager.executeCommand(command, args, serverClient, eventManager));
+                    }
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(50);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }.start();
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
@@ -100,6 +129,13 @@ public class Server implements Runnable, IServer {
         try {
             while (true) {
                 long curTime = System.currentTimeMillis();
+                Iterator<Runnable> iterator = toRun.iterator();
+                while (iterator.hasNext()) {
+                    Runnable r = iterator.next();
+                    r.run();
+                    iterator.remove();
+                }
+
                 synchronized (clientInput) {
                     for (int i = 0, clientInputSize = clientInput.size(); i < clientInputSize; i++) {
                         DataInputStream e = clientInput.get(i);
@@ -124,11 +160,12 @@ public class Server implements Runnable, IServer {
                             }
                         }
                         if (mType.equals(DataType.ClientHello)) {
-                            IChatClient client = new ChatClient(message, UUID.randomUUID(), clientSockets.get(i));
+                            IChatClient client = new ChatClient(message, UUID.nameUUIDFromBytes(message.getBytes()), clientSockets.get(i));
                             JoinEvent joinEvent = new JoinEvent(client);
                             eventManager.fireEvent(joinEvent);
                             if (joinEvent.isCanceled()) {
                                 client.sendData("You were kicked.", DataType.Kick);
+                                chatRoomManager.kickClient(client);
                                 continue;
                             }
                             heartbeat.put(client, 10000);
@@ -163,13 +200,7 @@ public class Server implements Runnable, IServer {
                                 command = message.replace("/", "");
                                 args = new String[]{};
                             }
-                            PreCommandEvent event = new PreCommandEvent(command, args, sender);
-                            eventManager.fireEvent(event);
-                            if (event.isCanceled()) {
-                                continue;
-                            }
-                            System.out.println(sender.getName() + " executed: " + message);
-                            commandManager.executeCommand(command, args, sender);
+                            commandManager.executeCommand(command, args, sender, eventManager);
                         }
                     }
                 }
