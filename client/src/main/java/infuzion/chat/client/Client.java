@@ -30,6 +30,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class Client implements Runnable {
     private DataInputStream input;
@@ -62,7 +63,6 @@ public class Client implements Runnable {
                 }
             }
         }, 10, 5000);
-        heartbeat.cancel();
     }
 
     private void disconnection(Throwable throwable) {
@@ -120,6 +120,7 @@ public class Client implements Runnable {
     public void run() {
         try {
             while (true) {
+                long curTime = System.currentTimeMillis();
                 if (input.available() <= 0) {
                     continue;
                 }
@@ -138,7 +139,10 @@ public class Client implements Runnable {
                     System.out.println(message);
                     MainChatController.displayMessage(message + "\n");
                 }
-                Thread.sleep(50);
+                while (curTime + 100 > System.currentTimeMillis()) {
+                    long toSleep = (curTime + 100) - System.currentTimeMillis();
+                    TimeUnit.MILLISECONDS.sleep(toSleep);
+                }
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
