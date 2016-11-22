@@ -39,11 +39,28 @@ public class PermissionAttachment implements Iterable<Permission> {
      * @param permissions List of permissions to set
      */
     public PermissionAttachment(List<Permission> permissions) {
-        this.permissions = permissions;
+        if (permissions != null) {
+            this.permissions = permissions;
+        } else {
+            this.permissions = new ArrayList<>();
+        }
     }
 
     public void addPermission(Permission permission) {
         permissions.add(permission);
+    }
+
+    /**
+     * Adds the specified PermissionAttachment to this PermissionAttachment
+     *
+     * @param permissions The PermissionAttachment to add
+     */
+    public void addPermissions(PermissionAttachment permissions) {
+        System.out.println("added: ");
+        for (Permission e : permissions) {
+            System.out.println("added: " + e);
+            addPermission(e);
+        }
     }
 
     public List<Permission> getPermissions() {
@@ -64,13 +81,14 @@ public class PermissionAttachment implements Iterable<Permission> {
      * @return an Iterator.
      */
     @Override
-    public Iterator iterator() {
+    @SuppressWarnings("unchecked")
+    public Iterator<Permission> iterator() {
         return new Iterator() {
             private int index = 0;
 
             @Override
             public boolean hasNext() {
-                return permissions.size() < index;
+                return permissions.size() > index;
             }
 
             @Override
@@ -79,5 +97,15 @@ public class PermissionAttachment implements Iterable<Permission> {
                 return permissions.get(index - 1);
             }
         };
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof PermissionAttachment) {
+            if (permissions.equals(((PermissionAttachment) o).getPermissions())) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -14,27 +14,19 @@
  *    limitations under the License.
  */
 
-package infuzion.chat.server;
+package infuzion.chat.server.event.connection;
 
-import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+import infuzion.chat.server.IChatClient;
+import infuzion.chat.server.event.Event;
 
-public interface IServer {
-    void reload();
+public abstract class ConnectionEvent extends Event {
+    private final IChatClient client;
 
-    void stop();
+    public ConnectionEvent(IChatClient client) {
+        this.client = client;
+    }
 
-    IPluginManager getPluginManager();
-
-    IEventManager getEventManager();
-
-    CommandManager getCommandManager();
-
-    IPermissionManager getPermissionManager();
-
-    int getTps();
-
-    long getTotalTps();
+    public IChatClient getClient() {
+        return client;
+    }
 }

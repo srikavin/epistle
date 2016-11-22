@@ -14,27 +14,18 @@
  *    limitations under the License.
  */
 
-package infuzion.chat.server;
+package infuzion.chat.server.event.reflection;
 
-import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+public enum EventPriority {
+    LOW(0),
+    NORMAL(1),
+    HIGH(2),
+    VERY_HIGH(3),
+    MONITOR(4);
 
-public interface IServer {
-    void reload();
+    final int priority;
 
-    void stop();
-
-    IPluginManager getPluginManager();
-
-    IEventManager getEventManager();
-
-    CommandManager getCommandManager();
-
-    IPermissionManager getPermissionManager();
-
-    int getTps();
-
-    long getTotalTps();
+    EventPriority(int priority) {
+        this.priority = priority;
+    }
 }

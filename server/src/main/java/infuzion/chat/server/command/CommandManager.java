@@ -19,9 +19,9 @@ package infuzion.chat.server.command;
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.Server;
 import infuzion.chat.server.command.vanilla.*;
+import infuzion.chat.server.event.IEventManager;
+import infuzion.chat.server.event.command.PreCommandEvent;
 import infuzion.chat.server.plugin.command.ICommandExecutor;
-import infuzion.chat.server.plugin.event.IEventManager;
-import infuzion.chat.server.plugin.event.command.PreCommandEvent;
 
 import java.util.ArrayList;
 import java.util.HashMap;

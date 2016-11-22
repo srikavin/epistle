@@ -14,27 +14,15 @@
  *    limitations under the License.
  */
 
-package infuzion.chat.server;
+package infuzion.chat.server.event.reflection;
 
-import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface IServer {
-    void reload();
-
-    void stop();
-
-    IPluginManager getPluginManager();
-
-    IEventManager getEventManager();
-
-    CommandManager getCommandManager();
-
-    IPermissionManager getPermissionManager();
-
-    int getTps();
-
-    long getTotalTps();
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface EventHandler {
+    EventPriority priority() default EventPriority.NORMAL;
 }

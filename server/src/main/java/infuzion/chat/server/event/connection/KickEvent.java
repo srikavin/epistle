@@ -14,27 +14,25 @@
  *    limitations under the License.
  */
 
-package infuzion.chat.server;
+package infuzion.chat.server.event.connection;
 
-import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+import infuzion.chat.server.IChatClient;
+import infuzion.chat.server.event.Cancelable;
 
-public interface IServer {
-    void reload();
+public class KickEvent extends QuitEvent implements Cancelable {
+    boolean canceled = false;
 
-    void stop();
+    public KickEvent(IChatClient client) {
+        super(client);
+    }
 
-    IPluginManager getPluginManager();
+    @Override
+    public boolean isCanceled() {
+        return canceled;
+    }
 
-    IEventManager getEventManager();
-
-    CommandManager getCommandManager();
-
-    IPermissionManager getPermissionManager();
-
-    int getTps();
-
-    long getTotalTps();
+    @Override
+    public void setCanceled(boolean canceled) {
+        this.canceled = canceled;
+    }
 }

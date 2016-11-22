@@ -16,13 +16,13 @@
 
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.command.Command;
+import infuzion.chat.server.event.IEventListener;
+import infuzion.chat.server.event.chat.MessageEvent;
+import infuzion.chat.server.event.command.PreCommandEvent;
+import infuzion.chat.server.event.connection.JoinEvent;
+import infuzion.chat.server.event.reflection.EventHandler;
 import infuzion.chat.server.plugin.Plugin;
 import infuzion.chat.server.plugin.command.ICommandExecutor;
-import infuzion.chat.server.plugin.event.IEventListener;
-import infuzion.chat.server.plugin.event.chat.MessageEvent;
-import infuzion.chat.server.plugin.event.command.PreCommandEvent;
-import infuzion.chat.server.plugin.event.connection.JoinEvent;
-import infuzion.chat.server.plugin.event.reflection.EventHandler;
 
 public class test extends Plugin implements ICommandExecutor, IEventListener {
 
@@ -30,7 +30,7 @@ public class test extends Plugin implements ICommandExecutor, IEventListener {
     public void onEnable() {
         System.out.println("For testing: onEnable()");
         getCommandManager().registerCommand(new Command("test"), this);
-        getEventManager().registerEvents(this, this);
+        getEventManager().registerListener(this, this);
     }
 
     @Override

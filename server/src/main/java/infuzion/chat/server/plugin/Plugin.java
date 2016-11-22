@@ -18,7 +18,7 @@ package infuzion.chat.server.plugin;
 
 import infuzion.chat.server.IServer;
 import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.plugin.event.IEventManager;
+import infuzion.chat.server.event.IEventManager;
 
 public abstract class Plugin {
     private boolean isEnabled;

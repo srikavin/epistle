@@ -18,12 +18,12 @@ package infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
 import infuzion.chat.server.command.CommandManager;
+import infuzion.chat.server.event.EventManager;
+import infuzion.chat.server.event.IEventManager;
+import infuzion.chat.server.event.chat.MessageEvent;
+import infuzion.chat.server.event.connection.JoinEvent;
 import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.permission.def.DefaultPermissionManager;
-import infuzion.chat.server.plugin.event.EventManager;
-import infuzion.chat.server.plugin.event.IEventManager;
-import infuzion.chat.server.plugin.event.chat.MessageEvent;
-import infuzion.chat.server.plugin.event.connection.JoinEvent;
+import infuzion.chat.server.permission.infuzion.chat.server.permission.def.DefaultPermissionManager;
 import infuzion.chat.server.plugin.loader.IPluginManager;
 import infuzion.chat.server.plugin.loader.PluginManager;
 
@@ -62,10 +62,6 @@ public class Server implements Runnable, IServer {
         chatRoomManager = new ChatRoomManager();
         pluginManager = new PluginManager(this);
         eventManager = new EventManager(this);
-        permissionManager = new DefaultPermissionManager(this);
-
-        //Init this last
-        commandManager = new CommandManager(this);
 
         new Thread(() -> {
             while (true) {

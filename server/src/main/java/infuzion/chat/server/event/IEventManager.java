@@ -14,27 +14,16 @@
  *    limitations under the License.
  */
 
-package infuzion.chat.server;
+package infuzion.chat.server.event;
 
-import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+import infuzion.chat.server.plugin.Plugin;
 
-public interface IServer {
-    void reload();
+public interface IEventManager {
+    void registerEvent(Class<? extends Event> events);
 
-    void stop();
+    void registerListener(IEventListener listener, Plugin plugin);
 
-    IPluginManager getPluginManager();
+    void fireEvent(Event event);
 
-    IEventManager getEventManager();
-
-    CommandManager getCommandManager();
-
-    IPermissionManager getPermissionManager();
-
-    int getTps();
-
-    long getTotalTps();
+    void reset();
 }

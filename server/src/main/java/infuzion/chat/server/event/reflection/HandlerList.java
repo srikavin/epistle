@@ -14,27 +14,29 @@
  *    limitations under the License.
  */
 
-package infuzion.chat.server;
+package infuzion.chat.server.event.reflection;
 
-import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+import java.util.ArrayList;
+import java.util.List;
 
-public interface IServer {
-    void reload();
+public class HandlerList {
+    private static List<Listener> allListeners = new ArrayList<>();
+    private volatile List<Listener> handlers = new ArrayList<>();
 
-    void stop();
+    public List<Listener> getHandlers() {
+        return handlers;
+    }
 
-    IPluginManager getPluginManager();
+    public void register(Listener listener) {
+        handlers.add(listener);
+    }
 
-    IEventManager getEventManager();
+    public List<Listener> getAllListeners() {
+        return allListeners;
+    }
 
-    CommandManager getCommandManager();
-
-    IPermissionManager getPermissionManager();
-
-    int getTps();
-
-    long getTotalTps();
+    public void reset() {
+        allListeners = new ArrayList<>();
+        handlers = new ArrayList<>();
+    }
 }

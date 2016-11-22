@@ -14,27 +14,13 @@
  *    limitations under the License.
  */
 
-package infuzion.chat.server;
+package infuzion.chat.server.event.command;
 
-import infuzion.chat.server.command.CommandManager;
-import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+import infuzion.chat.server.IChatClient;
 
-public interface IServer {
-    void reload();
+public class PreCommandEvent extends CommandEvent {
 
-    void stop();
-
-    IPluginManager getPluginManager();
-
-    IEventManager getEventManager();
-
-    CommandManager getCommandManager();
-
-    IPermissionManager getPermissionManager();
-
-    int getTps();
-
-    long getTotalTps();
+    public PreCommandEvent(String command, String[] args, IChatClient sender) {
+        super(command, args, sender);
+    }
 }
