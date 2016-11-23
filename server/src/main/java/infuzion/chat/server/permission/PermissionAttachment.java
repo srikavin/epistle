@@ -58,9 +58,7 @@ public class PermissionAttachment implements Iterable<Permission> {
      * @param permissions The PermissionAttachment to add
      */
     public void addPermissions(PermissionAttachment permissions) {
-        System.out.println("added: ");
         for (Permission e : permissions) {
-            System.out.println("added: " + e);
             addPermission(e);
         }
     }
