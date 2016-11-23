@@ -32,7 +32,7 @@ import infuzion.chat.server.permission.Permission;
 import infuzion.chat.server.permission.PermissionAttachment;
 import infuzion.chat.server.permission.PermissionDefault;
 
-import java.io.*;
+import java.io.InputStreamReader;
 import java.util.*;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -46,70 +46,62 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     private Map<String, List<String>> groupInheritanceMap;
     private Map<UUID, PermissionAttachment> permissionMap;
     private PermissionAttachment defaultPerms;
-    private File permissionFile;
     private String defaultGroup;
 
-    public DefaultPermissionManager(IServer server) {
+    public DefaultPermissionManager(IServer server, Map<String, Map<String, List<String>>> map) {
         this.permissionMap = new HashMap<>();
         this.commandPermissionMap = new HashMap<>();
         this.groupPermissionMap = new HashMap<>();
         this.chatClientGroupMap = new HashMap<>();
         this.groupInheritanceMap = new HashMap<>();
         defaultPerms = new PermissionAttachment();
-        permissionFile = new File("permissions.yml");
         server.getEventManager().registerListener(this, null);
-        try {
-            permissionFile.createNewFile();
-            Reader reader = new InputStreamReader(new FileInputStream(permissionFile));
-
-            YamlReader ymlReader = new YamlReader(reader);
-            Object object = ymlReader.read();
-            @SuppressWarnings("unchecked")
-            Map<String, Map<String, List<String>>> map = (Map<String, Map<String, List<String>>>) object;
-            if (map == null) {
-                System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-                System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-                System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-                System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-                System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-                return;
-            }
-            for (Map.Entry<String, Map<String, List<String>>> entry : map.entrySet()) {
-                String groupName = entry.getKey();
-                Map<String, List<String>> value = entry.getValue();
-                List<Permission> permissions = null;
-                PermissionAttachment attachment = null;
-
-                List<String> groups = new ArrayList<>();
-
-                if (value.containsKey("permissions")) {
-                    permissions = value.get("permissions").stream().map(Permission::new).collect(Collectors.toList());
-                    attachment = new PermissionAttachment(permissions);
-                }
-                if (value.containsKey("group")) {
-                    groups.addAll(value.get("group"));
-                }
-                if (permissions != null && permissions.size() != 0) {
-                    if (groupName.equals("*")) {
-                        defaultPerms = attachment;
-                    } else if (uuidTest.matcher(groupName).matches()) {
-                        permissionMap.put(UUID.fromString(entry.getKey()), attachment);
-                    } else {
-                        groupPermissionMap.put(groupName, attachment);
-                    }
-                }
-
-                if (groups.size() != 0) {
-                    groupInheritanceMap.put(groupName, groups);
-                }
-            }
-        } catch (FileNotFoundException | YamlException e) {
-            e.printStackTrace();
-            System.out.println("Invalid permissions.yml file!");
-            System.exit(-1);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (map == null) {
+            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
+            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
+            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
+            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
+            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
+            return;
         }
+        for (Map.Entry<String, Map<String, List<String>>> entry : map.entrySet()) {
+            String groupName = entry.getKey();
+            Map<String, List<String>> value = entry.getValue();
+            List<Permission> permissions = null;
+            PermissionAttachment attachment = null;
+
+            List<String> groups = new ArrayList<>();
+
+            if (value.containsKey("permissions")) {
+                permissions = value.get("permissions").stream().map(Permission::new).collect(Collectors.toList());
+                attachment = new PermissionAttachment(permissions);
+            }
+            if (value.containsKey("group")) {
+                groups.addAll(value.get("group"));
+            }
+            if (permissions != null && permissions.size() != 0) {
+                if (groupName.equals("*")) {
+                    defaultPerms = attachment;
+                } else if (uuidTest.matcher(groupName).matches()) {
+                    permissionMap.put(UUID.fromString(entry.getKey()), attachment);
+                    if (value.containsKey("group")) {
+                        chatClientGroupMap.put(UUID.fromString(entry.getKey()), value.get("group"));
+                    }
+                } else {
+                    groupPermissionMap.put(groupName, attachment);
+                }
+            }
+
+            if (groups.size() != 0) {
+                groupInheritanceMap.put(groupName, groups);
+            }
+        }
+
+    }
+
+    public DefaultPermissionManager(IServer server, InputStreamReader permissionFileReader) throws YamlException {
+        //noinspection unchecked
+        this(server, (Map<String, Map<String, List<String>>>) new YamlReader(permissionFileReader).read());
     }
 
     @Override
@@ -120,14 +112,14 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
         if (permission.getType().equals(PermissionDefault.TRUE)) { // Needs to be changed for negated permissions
             return true;
         } else {
-            if (permissionMap.get(chatClient.getUuid()) != null) {
-                return permissionMap.get(chatClient.getUuid()).containsPermission(permission);
-            } else {
-                PermissionAttachment pA = getPermissionAttachment(chatClient);
-                if (pA != null && pA.containsPermission(permission)) {
-                    return true;
-                }
+//            if (permissionMap.get(chatClient.getUuid()) != null) {
+//                return permissionMap.get(chatClient.getUuid()).containsPermission(permission);
+//            } else {
+            PermissionAttachment pA = getPermissionAttachment(chatClient);
+            if (pA != null && pA.containsPermission(permission)) {
+                return true;
             }
+//            }
         }
         return false;
     }
@@ -166,18 +158,15 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
 
     @Override
     public PermissionAttachment getPermissionAttachment(IChatClient chatClient) {
-        PermissionAttachment toReturn;
+        PermissionAttachment toReturn = new PermissionAttachment();
         if (chatClient.getPermissionAttachment() != null) {
             toReturn = chatClient.getPermissionAttachment();
         } else if (permissionMap.containsKey(chatClient.getUuid())) {
-            PermissionAttachment temp = new PermissionAttachment();
             List<String> groups = chatClientGroupMap.getOrDefault(chatClient.getUuid(), new ArrayList<>());
             for (String group : groups) {
-                temp.addPermissions(combineInheritedPermissions(group));
+                toReturn.addPermissions(combineInheritedPermissions(group));
             }
-            toReturn = permissionMap.get(chatClient.getUuid());
-        } else {
-            toReturn = new PermissionAttachment();
+            toReturn.addPermissions(permissionMap.get(chatClient.getUuid()));
         }
 
         chatClient.setPermissionAttachment(toReturn);
@@ -187,13 +176,15 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     private PermissionAttachment combineInheritedPermissions(String group) {
         PermissionAttachment toReturn =
                 (groupPermissionMap.containsKey(group)) ? groupPermissionMap.get(group) : new PermissionAttachment();
-        for (String inheritedGroup : groupInheritanceMap.get(group)) {
-            if (groupInheritanceMap.containsKey(inheritedGroup)) {
-                PermissionAttachment temp = combineInheritedPermissions(inheritedGroup);
-                temp.addPermissions(groupPermissionMap.get(inheritedGroup));
-                toReturn.addPermissions(temp);
-            } else {
-                toReturn.addPermissions(groupPermissionMap.get(group));
+        if (groupInheritanceMap.containsKey(group)) {
+            for (String inheritedGroup : groupInheritanceMap.get(group)) {
+                if (groupInheritanceMap.containsKey(inheritedGroup)) {
+                    PermissionAttachment temp = combineInheritedPermissions(inheritedGroup);
+                    temp.addPermissions(groupPermissionMap.get(inheritedGroup));
+                    toReturn.addPermissions(temp);
+                } else {
+                    toReturn.addPermissions(groupPermissionMap.get(inheritedGroup));
+                }
             }
         }
         return toReturn;

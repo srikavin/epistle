@@ -31,6 +31,7 @@ import infuzion.chat.server.plugin.loader.PluginManager;
 
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
@@ -54,6 +55,7 @@ public class Server implements Runnable, IServer {
     private IChatClient serverClient = new ServerChatClient();
     private Scanner scanner;
     private volatile List<Runnable> toRun = new ArrayList<>();
+    private File permissionFile = new File("permissions.yml");
 
     @SuppressWarnings("InfiniteLoopStatement")
     Server(int port) throws IOException {
@@ -229,7 +231,7 @@ public class Server implements Runnable, IServer {
             file.mkdir();
             pluginManager = new PluginManager(this);
             eventManager.reset();
-            permissionManager = new DefaultPermissionManager(this);
+            permissionManager = new DefaultPermissionManager(this, new FileReader(permissionFile));
             //Init this last
             commandManager = new CommandManager(this);
             pluginManager.addAllPlugins(file);
