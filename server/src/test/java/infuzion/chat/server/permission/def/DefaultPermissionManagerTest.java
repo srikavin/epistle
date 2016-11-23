@@ -16,13 +16,14 @@
  *
  */
 
-package infuzion.chat.server.permission.infuzion.chat.server.permission.def;
+package infuzion.chat.server.permission.def;
 
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.IServer;
 import infuzion.chat.server.event.command.PreCommandEvent;
-import infuzion.chat.server.permission.FakeClient;
-import infuzion.chat.server.permission.FakeServer;
+import infuzion.chat.server.mock.FakeClient;
+import infuzion.chat.server.mock.FakeServer;
+import infuzion.chat.server.mock.FakeServerClient;
 import infuzion.chat.server.permission.Permission;
 import infuzion.chat.server.permission.PermissionAttachment;
 import org.junit.Test;
@@ -36,11 +37,17 @@ public class DefaultPermissionManagerTest {
         IServer server = new FakeServer();
         DefaultPermissionManager defaultPermissionManager = new DefaultPermissionManager(server);
         IChatClient fakeClient = new FakeClient();
+
         assertFalse(defaultPermissionManager.hasPermission("should.not.have.this.permission", fakeClient));
+
         PermissionAttachment pA = new PermissionAttachment();
         pA.addPermission(new Permission("should.have.this.permission"));
         fakeClient.setPermissionAttachment(pA);
+
         assertTrue(defaultPermissionManager.hasPermission(new Permission("should.have.this.permission"), fakeClient));
+
+        IChatClient fakeServerClient = new FakeServerClient();
+        assertTrue(defaultPermissionManager.hasPermission("should.have.this", fakeServerClient));
     }
 
     @Test
@@ -48,9 +55,12 @@ public class DefaultPermissionManagerTest {
         IServer server = new FakeServer();
         DefaultPermissionManager defaultPermissionManager = new DefaultPermissionManager(server);
         IChatClient fakeClient = new FakeClient();
+
         defaultPermissionManager.registerPermission("test", "chat.test");
+
         PreCommandEvent shouldBeCanceled = new PreCommandEvent("test", new String[]{}, fakeClient);
         defaultPermissionManager.onCommand(shouldBeCanceled);
+
         assertTrue("Event should be canceled", shouldBeCanceled.isCanceled());
     }
 
@@ -59,6 +69,7 @@ public class DefaultPermissionManagerTest {
         IServer server = new FakeServer();
         DefaultPermissionManager defaultPermissionManager = new DefaultPermissionManager(server);
         IChatClient fakeClient = new FakeClient();
+
         PermissionAttachment shouldBeEmpty = defaultPermissionManager.getPermissionAttachment(fakeClient);
         assertTrue("Should be empty", shouldBeEmpty.getPermissions().size() == 0);
     }

@@ -16,51 +16,31 @@
  *
  */
 
-package infuzion.chat.server.permission;
+package infuzion.chat.server.mock;
 
-import infuzion.chat.server.IServer;
-import infuzion.chat.server.command.CommandManager;
+import infuzion.chat.server.event.Event;
+import infuzion.chat.server.event.IEventListener;
 import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+import infuzion.chat.server.plugin.Plugin;
 
-
-public class FakeServer implements IServer {
+public class FakeEventManager implements IEventManager {
     @Override
-    public void reload() {
-    }
-
-    @Override
-    public void stop() {
+    public void registerEvent(Class<? extends Event> events) {
 
     }
 
     @Override
-    public IPluginManager getPluginManager() {
-        return null;
+    public void registerListener(IEventListener listener, Plugin plugin) {
+
     }
 
     @Override
-    public IEventManager getEventManager() {
-        return new FakeEventManager();
+    public void fireEvent(Event event) {
+
     }
 
     @Override
-    public CommandManager getCommandManager() {
-        return null;
-    }
+    public void reset() {
 
-    @Override
-    public IPermissionManager getPermissionManager() {
-        return null;
-    }
-
-    @Override
-    public int getTps() {
-        return 0;
-    }
-
-    @Override
-    public long getTotalTps() {
-        return 0;
     }
 }

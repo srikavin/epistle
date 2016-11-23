@@ -16,7 +16,7 @@
  *
  */
 
-package infuzion.chat.server.permission.infuzion.chat.server.permission.def;
+package infuzion.chat.server.permission.def;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
@@ -114,6 +114,9 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
 
     @Override
     public boolean hasPermission(Permission permission, IChatClient chatClient) {
+        if (chatClient.isConsole()) {
+            return true;
+        }
         if (permission.getType().equals(PermissionDefault.TRUE)) { // Needs to be changed for negated permissions
             return true;
         } else {

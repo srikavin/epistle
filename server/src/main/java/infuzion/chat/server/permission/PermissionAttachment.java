@@ -19,6 +19,7 @@
 package infuzion.chat.server.permission;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -102,6 +103,8 @@ public class PermissionAttachment implements Iterable<Permission> {
     @Override
     public boolean equals(Object o) {
         if (o instanceof PermissionAttachment) {
+            permissions.sort(Comparator.comparing(Permission::toString));
+            ((PermissionAttachment) o).getPermissions().sort(Comparator.comparing(Permission::toString));
             if (permissions.equals(((PermissionAttachment) o).getPermissions())) {
                 return true;
             }

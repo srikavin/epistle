@@ -16,11 +16,12 @@
  *
  */
 
-package infuzion.chat.server.permission;
+package infuzion.chat.server.mock;
 
 import infuzion.chat.common.DataType;
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.IChatRoom;
+import infuzion.chat.server.permission.PermissionAttachment;
 
 import java.util.UUID;
 

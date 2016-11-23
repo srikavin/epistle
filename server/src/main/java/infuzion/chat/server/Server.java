@@ -25,7 +25,7 @@ import infuzion.chat.server.event.IEventManager;
 import infuzion.chat.server.event.chat.MessageEvent;
 import infuzion.chat.server.event.connection.JoinEvent;
 import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.permission.infuzion.chat.server.permission.def.DefaultPermissionManager;
+import infuzion.chat.server.permission.def.DefaultPermissionManager;
 import infuzion.chat.server.plugin.loader.IPluginManager;
 import infuzion.chat.server.plugin.loader.PluginManager;
 

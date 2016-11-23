@@ -16,18 +16,15 @@
  *
  */
 
-package infuzion.chat.server.permission.infuzion.chat.server.permission;
+package infuzion.chat.server.permission;
 
-import infuzion.chat.server.permission.Permission;
-import infuzion.chat.server.permission.PermissionAttachment;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class PermissionAttachmentTest {
     @Test
@@ -37,6 +34,40 @@ public class PermissionAttachmentTest {
         Permission permission1 = new Permission("1");
         pA.addPermission(permission1);
         assertTrue(pA.getPermissions().contains(permission1));
+    }
+
+    @Test
+    public void nonNullList() throws Exception {
+        List<Permission> permissions = new ArrayList<>();
+        permissions.add(new Permission("1"));
+        permissions.add(new Permission("2"));
+        permissions.add(new Permission("3"));
+        permissions.add(new Permission("4"));
+        PermissionAttachment pA = new PermissionAttachment(permissions);
+        assertTrue(pA.containsPermission(new Permission("1")));
+        assertTrue(pA.containsPermission(new Permission("2")));
+        assertTrue(pA.containsPermission(new Permission("3")));
+        assertTrue(pA.containsPermission(new Permission("4")));
+    }
+
+    @Test
+    public void equals() {
+        PermissionAttachment pA = new PermissionAttachment();
+        pA.addPermission(new Permission("213"));
+        Object obj = new Object();
+        assertFalse(pA.equals(obj));
+
+        PermissionAttachment pA1 = new PermissionAttachment();
+        pA1.addPermission(new Permission("123"));
+
+        assertFalse(pA.equals(pA1));
+        assertFalse(pA1.equals(pA));
+
+        pA.addPermission(new Permission("123"));
+        pA1.addPermission(new Permission("213"));
+
+        assertTrue(pA.equals(pA1));
+        assertTrue(pA1.equals(pA));
     }
 
     @Test

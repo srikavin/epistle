@@ -20,11 +20,11 @@ package infuzion.chat.server.event;
 
 import infuzion.chat.server.event.reflection.EventHandler;
 import infuzion.chat.server.event.reflection.EventPriority;
-import infuzion.chat.server.permission.FakeServer;
+import infuzion.chat.server.event.reflection.Listener;
+import infuzion.chat.server.mock.FakeServer;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class EventManagerTest implements IEventListener {
     private boolean[] orderCalled = {false, false, false, false, false};
@@ -57,6 +57,18 @@ public class EventManagerTest implements IEventListener {
         eventManager.registerListener(this, null);
         eventManager.fireEvent(new FakeEvent());
         eventManager.reset();
+    }
+
+    @Test
+    public void invalidEventListener() {
+        IEventManager eventManager = new EventManager(new FakeServer());
+        eventManager.registerListener(new InvalidListener(), null);
+        eventManager.fireEvent(new FakeEvent());
+        for (Listener e : Event.getAllHandlers()) {
+            if (e.getEventListener() instanceof InvalidListener) {
+                fail("Should not be added");
+            }
+        }
     }
 
     @Test

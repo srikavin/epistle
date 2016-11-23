@@ -16,31 +16,11 @@
  *
  */
 
-package infuzion.chat.server.permission;
+package infuzion.chat.server.mock;
 
-import infuzion.chat.server.event.Event;
-import infuzion.chat.server.event.IEventListener;
-import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.plugin.Plugin;
-
-public class FakeEventManager implements IEventManager {
+public class FakeServerClient extends FakeClient {
     @Override
-    public void registerEvent(Class<? extends Event> events) {
-
-    }
-
-    @Override
-    public void registerListener(IEventListener listener, Plugin plugin) {
-
-    }
-
-    @Override
-    public void fireEvent(Event event) {
-
-    }
-
-    @Override
-    public void reset() {
-
+    public boolean isConsole() {
+        return true;
     }
 }
