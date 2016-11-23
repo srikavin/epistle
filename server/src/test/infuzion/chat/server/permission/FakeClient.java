@@ -25,7 +25,7 @@ import infuzion.chat.server.IChatRoom;
 import java.util.UUID;
 
 public class FakeClient implements IChatClient {
-    PermissionAttachment permissions;
+    private PermissionAttachment permissions;
 
     @Override
     public void kick(String message) {
