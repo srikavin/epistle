@@ -28,7 +28,6 @@ public interface IPermissionManager {
 
     boolean hasPermission(Permission permission, IChatClient chatClient);
 
-    PermissionAttachment getPermissions(IChatClient client);
 
     void registerPermission(Command command, Permission permission);
 
@@ -38,6 +37,7 @@ public interface IPermissionManager {
 
     PermissionAttachment getPermissionAttachment(IChatClient chatClient);
 
+    @SuppressWarnings("SameReturnValue")
     default String noPermissionMessage() {
         return "Sorry, you are not allowed to perform that action.";
     }

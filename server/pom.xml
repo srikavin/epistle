@@ -57,6 +57,10 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>org.apache</groupId>
+                <artifactId>maven-surefire</artifactId>
+            </plugin>
         </plugins>
 
     </build>

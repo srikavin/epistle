@@ -18,8 +18,10 @@
 
 package infuzion.chat.server;
 
+import com.esotericsoftware.yamlbeans.YamlException;
 import infuzion.chat.common.DataType;
 import infuzion.chat.server.command.CommandManager;
+import infuzion.chat.server.command.ICommandManager;
 import infuzion.chat.server.event.EventManager;
 import infuzion.chat.server.event.IEventManager;
 import infuzion.chat.server.event.chat.MessageEvent;
@@ -29,10 +31,7 @@ import infuzion.chat.server.permission.def.DefaultPermissionManager;
 import infuzion.chat.server.plugin.loader.IPluginManager;
 import infuzion.chat.server.plugin.loader.PluginManager;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -41,27 +40,27 @@ import java.util.concurrent.TimeUnit;
 
 public class Server implements Runnable, IServer {
     private final List<DataInputStream> clientInput = new ArrayList<>();
+    private final List<Socket> clientSockets = new ArrayList<>();
+    private final Map<IChatClient, Integer> heartbeat = new HashMap<>();
+    private final IChatClient serverClient = new ServerChatClient();
+    private final Scanner scanner;
+    private final List<Runnable> toRun = new ArrayList<>();
+    private final File permissionFile = new File("permissions.yml");
     private ServerSocket socket;
-    private List<Socket> clientSockets = new ArrayList<>();
-    private Map<IChatClient, Integer> heartbeat = new HashMap<>();
     private IChatRoomManager chatRoomManager;
     private IPluginManager pluginManager;
-    private CommandManager commandManager;
+    private ICommandManager commandManager;
     private IEventManager eventManager;
     private IPermissionManager permissionManager;
     private int tps = 20;
     private long tpsTotal = 0;
     private long tpsCounter = 0;
-    private IChatClient serverClient = new ServerChatClient();
-    private Scanner scanner;
-    private volatile List<Runnable> toRun = new ArrayList<>();
-    private File permissionFile = new File("permissions.yml");
 
     @SuppressWarnings("InfiniteLoopStatement")
     Server(int port) throws IOException {
         scanner = new Scanner(System.in);
         socket = new ServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
-        System.out.println("Binded to port " + socket.getLocalPort() + " at " + socket.getInetAddress().toString());
+        System.out.println("Bound to port " + socket.getLocalPort() + " at " + socket.getInetAddress().toString());
 
         chatRoomManager = new ChatRoomManager();
         pluginManager = new PluginManager(this);
@@ -85,7 +84,8 @@ public class Server implements Runnable, IServer {
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (Iterator<Map.Entry<IChatClient, Integer>> iterator = heartbeat.entrySet().iterator(); iterator.hasNext(); ) {
+                for (Iterator<Map.Entry<IChatClient, Integer>> iterator = heartbeat.entrySet().iterator();
+                     iterator.hasNext(); ) {
                     Map.Entry<IChatClient, Integer> e = iterator.next();
                     e.setValue(e.getValue() - 1000);
                     if (e.getValue() <= 0) {
@@ -102,31 +102,29 @@ public class Server implements Runnable, IServer {
 
         reload();
 
-        new Thread() {
-            public void run() {
-                while (true) {
-                    if (scanner.hasNext()) {
-                        String input = scanner.nextLine();
-                        String[] split = input.split(" ");
-                        String[] args;
-                        String command;
-                        if (split.length > 1) {
-                            command = split[0];
-                            args = Arrays.copyOfRange(split, 1, split.length);
-                        } else {
-                            command = input;
-                            args = new String[]{};
-                        }
-                        toRun.add(() -> commandManager.executeCommand(command, args, serverClient, eventManager));
+        new Thread(() -> {
+            while (true) {
+                if (scanner.hasNext()) {
+                    String input = scanner.nextLine();
+                    String[] split = input.split(" ");
+                    String[] args;
+                    String command;
+                    if (split.length > 1) {
+                        command = split[0];
+                        args = Arrays.copyOfRange(split, 1, split.length);
+                    } else {
+                        command = input;
+                        args = new String[]{};
                     }
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(50);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    toRun.add(() -> commandManager.executeCommand(command, args, serverClient, eventManager));
+                }
+                try {
+                    TimeUnit.MILLISECONDS.sleep(50);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
-        }.start();
+        }).start();
     }
 
     @SuppressWarnings("InfiniteLoopStatement")
@@ -166,7 +164,8 @@ public class Server implements Runnable, IServer {
                             }
                         }
                         if (mType.equals(DataType.ClientHello)) {
-                            IChatClient client = new ChatClient(message, UUID.nameUUIDFromBytes(message.getBytes()), clientSockets.get(i));
+                            IChatClient client = new ChatClient(message, UUID.nameUUIDFromBytes(message.getBytes()),
+                                    clientSockets.get(i));
                             JoinEvent joinEvent = new JoinEvent(client);
                             eventManager.fireEvent(joinEvent);
                             if (joinEvent.isCanceled()) {
@@ -231,7 +230,14 @@ public class Server implements Runnable, IServer {
             file.mkdir();
             pluginManager = new PluginManager(this);
             eventManager.reset();
-            permissionManager = new DefaultPermissionManager(this, new FileReader(permissionFile));
+            try {
+                permissionManager = new DefaultPermissionManager(this,
+                        new InputStreamReader(new FileInputStream(permissionFile)));
+            } catch (YamlException e) {
+                System.out.println("Errors in permissions.yml");
+                e.printStackTrace();
+                System.exit(0);
+            }
             //Init this last
             commandManager = new CommandManager(this);
             pluginManager.addAllPlugins(file);
@@ -254,13 +260,17 @@ public class Server implements Runnable, IServer {
         return eventManager;
     }
 
-    public CommandManager getCommandManager() {
+    public ICommandManager getCommandManager() {
         return commandManager;
     }
 
     @Override
     public IPermissionManager getPermissionManager() {
         return permissionManager;
+    }
+
+    public void setPermissionManager(IPermissionManager permissionManager) {
+        this.permissionManager = permissionManager;
     }
 
     public int getTps() {

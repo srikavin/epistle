@@ -21,6 +21,7 @@ package infuzion.chat.server.event.connection;
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.event.Event;
 
+@SuppressWarnings("WeakerAccess")
 public abstract class ConnectionEvent extends Event {
     private final IChatClient client;
 

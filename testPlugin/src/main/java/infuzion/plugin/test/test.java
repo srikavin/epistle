@@ -16,6 +16,8 @@
  *
  */
 
+package infuzion.plugin.test;
+
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.command.Command;
 import infuzion.chat.server.event.IEventListener;
@@ -23,6 +25,9 @@ import infuzion.chat.server.event.chat.MessageEvent;
 import infuzion.chat.server.event.command.PreCommandEvent;
 import infuzion.chat.server.event.connection.JoinEvent;
 import infuzion.chat.server.event.reflection.EventHandler;
+import infuzion.chat.server.permission.Permission;
+import infuzion.chat.server.permission.PermissionAttachment;
+import infuzion.chat.server.permission.PermissionDefault;
 import infuzion.chat.server.plugin.Plugin;
 import infuzion.chat.server.plugin.command.ICommandExecutor;
 
@@ -30,30 +35,47 @@ public class test extends Plugin implements ICommandExecutor, IEventListener {
 
     @Override
     public void onEnable() {
+        System.setProperty("enabled", "1");
         System.out.println("For testing: onEnable()");
+
         getCommandManager().registerCommand(new Command("test"), this);
+        getCommandManager().registerCommand(new Command("permissions"), this);
+        getPermissionManager().registerPermission(new Command("test"), new Permission("test.test",
+                PermissionDefault.TRUE));
+        getPermissionManager().registerPermission(new Command("permissions"),
+                new Permission("test.permission", PermissionDefault.TRUE));
         getEventManager().registerListener(this, this);
     }
 
     @Override
     public void onLoad() {
+        System.setProperty("loaded", "1");
         System.out.println("For testing: onLoad()");
     }
 
     @Override
     public void onDisable() {
+        System.setProperty("disabled", "1");
         System.out.println("For testing: onDisable()");
     }
 
 
     @Override
     public void onCommand(String commandName, String[] args, IChatClient client) {
-        client.sendMessage("Your inputted arguments are displayed below: ");
-        StringBuilder toSend = new StringBuilder();
-        for (String e : args) {
-            toSend.append(e).append("\n");
+        if (commandName.equalsIgnoreCase("test")) {
+            client.sendMessage("Your inputted arguments are displayed below: ");
+            StringBuilder toSend = new StringBuilder();
+            for (String e : args) {
+                toSend.append(e).append("\n");
+            }
+            client.sendMessage(toSend.toString());
+        } else if (commandName.equalsIgnoreCase("permissions")) {
+            PermissionAttachment pA = getPermissionManager().getPermissionAttachment(client);
+            client.sendMessage("You have the following permissions: ");
+            for (Permission p : pA) {
+                client.sendMessage(" - " + p);
+            }
         }
-        client.sendMessage(toSend.toString());
     }
 
     @Override

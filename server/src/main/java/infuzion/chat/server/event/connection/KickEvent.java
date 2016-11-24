@@ -21,6 +21,7 @@ package infuzion.chat.server.event.connection;
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.event.Cancelable;
 
+@SuppressWarnings({"WeakerAccess", "unused"})
 public class KickEvent extends QuitEvent implements Cancelable {
     boolean canceled = false;
 

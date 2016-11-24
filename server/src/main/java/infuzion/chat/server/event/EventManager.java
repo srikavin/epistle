@@ -34,11 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class EventManager implements IEventManager {
-    private IServer server;
     private List<Class<? extends Event>> eventTypes = new ArrayList<>();
 
     public EventManager(IServer server) {
-        this.server = server;
         registerDefaultEvents();
     }
 

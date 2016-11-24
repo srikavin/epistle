@@ -27,7 +27,7 @@ import java.util.List;
  * Represents permissions attached to a {@link infuzion.chat.server.IChatClient ChatClient}
  */
 public class PermissionAttachment implements Iterable<Permission> {
-    private List<Permission> permissions;
+    private final List<Permission> permissions;
 
     /**
      * Creates this object with no permissions
@@ -50,7 +50,9 @@ public class PermissionAttachment implements Iterable<Permission> {
     }
 
     public void addPermission(Permission permission) {
-        permissions.add(permission);
+        if (!permissions.contains(permission)) {
+            permissions.add(permission);
+        }
     }
 
     /**
@@ -65,7 +67,7 @@ public class PermissionAttachment implements Iterable<Permission> {
     }
 
     public List<Permission> getPermissions() {
-        return permissions;
+        return new ArrayList<>(permissions);
     }
 
     /**

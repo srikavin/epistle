@@ -18,7 +18,7 @@
 
 package infuzion.chat.server;
 
-import infuzion.chat.server.command.CommandManager;
+import infuzion.chat.server.command.ICommandManager;
 import infuzion.chat.server.event.IEventManager;
 import infuzion.chat.server.permission.IPermissionManager;
 import infuzion.chat.server.plugin.loader.IPluginManager;
@@ -32,9 +32,11 @@ public interface IServer {
 
     IEventManager getEventManager();
 
-    CommandManager getCommandManager();
+    ICommandManager getCommandManager();
 
     IPermissionManager getPermissionManager();
+
+    void setPermissionManager(IPermissionManager permissionManager);
 
     int getTps();
 

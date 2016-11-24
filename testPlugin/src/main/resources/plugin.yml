@@ -1,3 +1,3 @@
 name: TestPlugin
 version: 2.101
-main: test
+main: infuzion.plugin.test.test

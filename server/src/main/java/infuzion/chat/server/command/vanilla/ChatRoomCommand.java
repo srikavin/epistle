@@ -51,7 +51,8 @@ public class ChatRoomCommand implements ICommandExecutor {
         }
     }
 
-    public String getPrefix() {
+    @SuppressWarnings("SameReturnValue")
+    private String getPrefix() {
         return "[ChatRoom] ";
     }
 

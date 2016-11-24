@@ -18,7 +18,7 @@
 
 package infuzion.chat.server.plugin.loader;
 
-import infuzion.chat.server.Server;
+import infuzion.chat.server.IServer;
 import infuzion.chat.server.plugin.Plugin;
 
 import java.io.File;
@@ -29,17 +29,16 @@ import java.util.List;
 import java.util.jar.JarFile;
 
 public class PluginManager implements IPluginManager {
-    private List<Plugin> plugins = new ArrayList<>();
-    private Server server;
+    private final List<Plugin> plugins = new ArrayList<>();
+    private final IServer server;
 
-    public PluginManager(Server server) {
+    public PluginManager(IServer server) {
         this.server = server;
     }
 
     public void addPlugin(File file) throws Exception {
         PluginDescriptionFile descriptionFile = new PluginDescriptionFile(new JarFile(file));
         ClassLoader loader = URLClassLoader.newInstance(new URL[]{file.toURI().toURL()});
-
         Plugin plugin = (Plugin) loader.loadClass(descriptionFile.getMainClass()).newInstance();
         plugin.init(descriptionFile, server);
         plugin.onLoad();
@@ -54,7 +53,9 @@ public class PluginManager implements IPluginManager {
         //noinspection ConstantConditions
         for (File f : file.listFiles()) {
             try {
-                addPlugin(f);
+                if (f.isFile()) {
+                    addPlugin(f);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

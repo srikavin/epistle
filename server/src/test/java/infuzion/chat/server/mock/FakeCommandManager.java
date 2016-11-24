@@ -18,55 +18,33 @@
 
 package infuzion.chat.server.mock;
 
-import infuzion.chat.server.IServer;
+import infuzion.chat.server.IChatClient;
+import infuzion.chat.server.command.Command;
 import infuzion.chat.server.command.ICommandManager;
 import infuzion.chat.server.event.IEventManager;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.plugin.loader.IPluginManager;
+import infuzion.chat.server.plugin.command.ICommandExecutor;
 
+import java.util.ArrayList;
+import java.util.List;
 
-public class FakeServer implements IServer {
+public class FakeCommandManager implements ICommandManager {
     @Override
-    public void reload() {
-    }
-
-    @Override
-    public void stop() {
-
-    }
-
-    @Override
-    public IPluginManager getPluginManager() {
-        return null;
-    }
-
-    @Override
-    public IEventManager getEventManager() {
-        return new FakeEventManager();
-    }
-
-    @Override
-    public ICommandManager getCommandManager() {
-        return new FakeCommandManager();
-    }
-
-    @Override
-    public IPermissionManager getPermissionManager() {
-        return null;
-    }
-
-    @Override
-    public void setPermissionManager(IPermissionManager permissionManager) {
+    public void registerCommand(Command command, ICommandExecutor executor) {
 
     }
 
     @Override
-    public int getTps() {
-        return 0;
+    public List<ICommandExecutor> getCommandExecutors() {
+        return new ArrayList<>();
     }
 
     @Override
-    public long getTotalTps() {
-        return 0;
+    public void addCommandExecutor(ICommandExecutor executor) {
+
+    }
+
+    @Override
+    public void executeCommand(String command, String[] args, IChatClient client, IEventManager eventManager) {
+
     }
 }

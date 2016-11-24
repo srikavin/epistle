@@ -22,10 +22,11 @@ import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.event.Cancelable;
 import infuzion.chat.server.event.Event;
 
+@SuppressWarnings("unused")
 public class CommandEvent extends Event implements Cancelable {
+    private final IChatClient sender;
     private String command;
     private String[] args;
-    private IChatClient sender;
     private boolean canceled = false;
 
     public CommandEvent(String command, String[] args, IChatClient sender) {

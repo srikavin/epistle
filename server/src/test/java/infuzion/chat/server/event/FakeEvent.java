@@ -18,5 +18,6 @@
 
 package infuzion.chat.server.event;
 
+@SuppressWarnings("WeakerAccess")
 public class FakeEvent extends Event {
 }

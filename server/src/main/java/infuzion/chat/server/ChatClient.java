@@ -34,12 +34,11 @@ public class ChatClient implements IChatClient {
     private final static Map<String, IChatClient> clientStringMap = new HashMap<>();
     private final String name;
     private final UUID uuid;
-
+    private final Socket socket;
     private PermissionAttachment permissionAttachment;
     private String prefix;
     private DataOutputStream outputStream;
     private IChatRoom currentIChatRoom;
-    private Socket socket;
 
     public ChatClient(String name, UUID uuid, Socket socket) {
         this.name = name;

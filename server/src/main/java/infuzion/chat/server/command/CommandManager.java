@@ -30,9 +30,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CommandManager {
-    private List<ICommandExecutor> vanillaCommandExecutors = new ArrayList<>();
-    private Map<Command, ICommandExecutor> pluginCommandExecutors = new HashMap<>();
+public class CommandManager implements ICommandManager {
+    private final List<ICommandExecutor> vanillaCommandExecutors = new ArrayList<>();
+    private final Map<Command, ICommandExecutor> pluginCommandExecutors = new HashMap<>();
 
     public CommandManager(Server server) {
         addCommandExecutor(new ChatRoomCommand());
@@ -42,18 +42,22 @@ public class CommandManager {
         addCommandExecutor(new TpsCommand(server));
     }
 
+    @Override
     public void registerCommand(Command command, ICommandExecutor executor) {
         pluginCommandExecutors.put(command, executor);
     }
 
+    @Override
     public List<ICommandExecutor> getCommandExecutors() {
         return vanillaCommandExecutors;
     }
 
-    private void addCommandExecutor(ICommandExecutor executor) {
+    @Override
+    public void addCommandExecutor(ICommandExecutor executor) {
         vanillaCommandExecutors.add(executor);
     }
 
+    @Override
     public void executeCommand(String command, String[] args, IChatClient client, IEventManager eventManager) {
         PreCommandEvent event = new PreCommandEvent(command, args, client);
         eventManager.fireEvent(event);

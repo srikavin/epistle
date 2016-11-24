@@ -24,7 +24,7 @@ import infuzion.chat.server.plugin.command.ICommandExecutor;
 
 public class TpsCommand implements ICommandExecutor {
 
-    private IServer server;
+    private final IServer server;
 
     public TpsCommand(IServer server) {
         this.server = server;

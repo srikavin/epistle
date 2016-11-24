@@ -22,8 +22,9 @@ import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.event.Cancelable;
 import infuzion.chat.server.event.Event;
 
+@SuppressWarnings("unused")
 public abstract class ChatEvent extends Event implements Cancelable {
-    private IChatClient sender;
+    private final IChatClient sender;
     private String message;
     private boolean canceled = false;
 

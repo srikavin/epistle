@@ -28,7 +28,7 @@ public class ChatRoom implements IChatRoom {
     private static IChatRoomManager IChatRoomManager;
     private final String name;
     private final UUID uuid;
-    private List<IChatClient> clients = new LinkedList<>();
+    private final List<IChatClient> clients = new LinkedList<>();
 
     public ChatRoom(String name){
         this.name = name;

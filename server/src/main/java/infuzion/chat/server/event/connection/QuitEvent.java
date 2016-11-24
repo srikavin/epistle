@@ -20,6 +20,7 @@ package infuzion.chat.server.event.connection;
 
 import infuzion.chat.server.IChatClient;
 
+@SuppressWarnings("WeakerAccess")
 public class QuitEvent extends ConnectionEvent {
     public QuitEvent(IChatClient client) {
         super(client);

@@ -64,6 +64,7 @@ public class ModeratorCommand implements ICommandExecutor {
         }
     }
 
+    @SuppressWarnings("SameReturnValue")
     public String getPrefix() {
         return "Moderator";
     }

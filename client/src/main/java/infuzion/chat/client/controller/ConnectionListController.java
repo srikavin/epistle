@@ -45,7 +45,7 @@ public class ConnectionListController {
     private File serversFile;
     private List<SerializableServer> servers = new ArrayList<>();
     private Map<String, Integer> stringIntegerMap = new HashMap<>();
-    private int counter = -1;
+    private int counter = 0;
     private Stage stage;
 
     public void setServersFile(File serversFile) {

@@ -16,17 +16,20 @@
  *
  */
 
-package infuzion.chat.server.permission;
+package infuzion.chat.server.command;
 
-public enum PermissionDefault {
-    FALSE((byte) 0),
-    TRUE((byte) 1);
+import infuzion.chat.server.IChatClient;
+import infuzion.chat.server.event.IEventManager;
+import infuzion.chat.server.plugin.command.ICommandExecutor;
 
-    final byte id;
+import java.util.List;
 
-    PermissionDefault(byte b) {
-        id = b;
-    }
+public interface ICommandManager {
+    void registerCommand(Command command, ICommandExecutor executor);
+
+    List<ICommandExecutor> getCommandExecutors();
+
+    void addCommandExecutor(ICommandExecutor executor);
+
+    void executeCommand(String command, String[] args, IChatClient client, IEventManager eventManager);
 }
-
-

@@ -24,7 +24,7 @@ import infuzion.chat.server.plugin.command.ICommandExecutor;
 
 public class ReloadCommand implements ICommandExecutor {
 
-    private Server server;
+    private final Server server;
 
     public ReloadCommand(Server server) {
         this.server = server;

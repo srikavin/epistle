@@ -23,7 +23,7 @@ import java.util.List;
 
 @SuppressWarnings("WeakerAccess")
 public class ChatRoomManager implements IChatRoomManager {
-    private List<IChatRoom> IChatRooms = new ArrayList<>();
+    private final List<IChatRoom> IChatRooms = new ArrayList<>();
 
     ChatRoomManager() {
         IChatRooms.add(new ChatRoom("default"));

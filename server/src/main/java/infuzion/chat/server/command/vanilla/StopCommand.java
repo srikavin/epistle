@@ -24,7 +24,7 @@ import infuzion.chat.server.plugin.command.ICommandExecutor;
 
 public class StopCommand implements ICommandExecutor {
 
-    private Server server;
+    private final Server server;
 
     public StopCommand(Server server) {
         this.server = server;

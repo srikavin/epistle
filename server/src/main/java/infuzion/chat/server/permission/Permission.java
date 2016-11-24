@@ -19,8 +19,8 @@
 package infuzion.chat.server.permission;
 
 public class Permission {
-    private String permission;
-    private PermissionDefault type;
+    private final String permission;
+    private final PermissionDefault type;
 
     public Permission(String permission) {
         this(permission, PermissionDefault.FALSE);
@@ -42,6 +42,8 @@ public class Permission {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof Permission && o.toString().equals(this.toString());
+        return o instanceof Permission
+                && o.toString().equals(this.toString())
+                && type.equals(((Permission) o).getType());
     }
 }

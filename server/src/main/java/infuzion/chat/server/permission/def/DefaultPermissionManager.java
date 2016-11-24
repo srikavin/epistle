@@ -38,13 +38,13 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DefaultPermissionManager implements IPermissionManager, IEventListener {
-    private static Pattern uuidTest = Pattern.compile("" +
+    private static final Pattern uuidTest = Pattern.compile("" +
             "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-    private Map<Command, Permission> commandPermissionMap;
-    private Map<String, PermissionAttachment> groupPermissionMap;
-    private Map<UUID, List<String>> chatClientGroupMap;
-    private Map<String, List<String>> groupInheritanceMap;
-    private Map<UUID, PermissionAttachment> permissionMap;
+    private final Map<Command, Permission> commandPermissionMap;
+    private final Map<String, PermissionAttachment> groupPermissionMap;
+    private final Map<UUID, List<String>> chatClientGroupMap;
+    private final Map<String, List<String>> groupInheritanceMap;
+    private final Map<UUID, PermissionAttachment> permissionMap;
     private PermissionAttachment defaultPerms;
     private String defaultGroup;
 
@@ -80,7 +80,7 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
                 groups.addAll(value.get("group"));
             }
             if (permissions != null && permissions.size() != 0) {
-                if (groupName.equals("*")) {
+                if (groupName.equals("default")) {
                     defaultPerms = attachment;
                 } else if (uuidTest.matcher(groupName).matches()) {
                     permissionMap.put(UUID.fromString(entry.getKey()), attachment);
@@ -97,6 +97,9 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
             }
         }
 
+        if (defaultPerms.getPermissions().size() > 0) {
+            defaultPerms = combineInheritedPermissions("default");
+        }
     }
 
     public DefaultPermissionManager(IServer server, InputStreamReader permissionFileReader) throws YamlException {
@@ -112,16 +115,13 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
         if (permission.getType().equals(PermissionDefault.TRUE)) { // Needs to be changed for negated permissions
             return true;
         } else {
-//            if (permissionMap.get(chatClient.getUuid()) != null) {
-//                return permissionMap.get(chatClient.getUuid()).containsPermission(permission);
-//            } else {
             PermissionAttachment pA = getPermissionAttachment(chatClient);
             if (pA != null && pA.containsPermission(permission)) {
                 return true;
             }
-//            }
         }
-        return false;
+        return chatClient.getPermissionAttachment() != null
+                && chatClient.getPermissionAttachment().containsPermission(permission);
     }
 
     @EventHandler
@@ -147,11 +147,6 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     }
 
     @Override
-    public PermissionAttachment getPermissions(IChatClient client) {
-        return permissionMap.get(client.getUuid());
-    }
-
-    @Override
     public void registerPermission(Command command, Permission permission) {
         commandPermissionMap.put(command, permission);
     }
@@ -159,17 +154,14 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     @Override
     public PermissionAttachment getPermissionAttachment(IChatClient chatClient) {
         PermissionAttachment toReturn = new PermissionAttachment();
-        if (chatClient.getPermissionAttachment() != null) {
-            toReturn = chatClient.getPermissionAttachment();
-        } else if (permissionMap.containsKey(chatClient.getUuid())) {
+        if (permissionMap.containsKey(chatClient.getUuid())) {
             List<String> groups = chatClientGroupMap.getOrDefault(chatClient.getUuid(), new ArrayList<>());
             for (String group : groups) {
                 toReturn.addPermissions(combineInheritedPermissions(group));
             }
             toReturn.addPermissions(permissionMap.get(chatClient.getUuid()));
+            toReturn.addPermissions(defaultPerms);
         }
-
-        chatClient.setPermissionAttachment(toReturn);
         return toReturn;
     }
 
@@ -179,9 +171,7 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
         if (groupInheritanceMap.containsKey(group)) {
             for (String inheritedGroup : groupInheritanceMap.get(group)) {
                 if (groupInheritanceMap.containsKey(inheritedGroup)) {
-                    PermissionAttachment temp = combineInheritedPermissions(inheritedGroup);
-                    temp.addPermissions(groupPermissionMap.get(inheritedGroup));
-                    toReturn.addPermissions(temp);
+                    toReturn.addPermissions(combineInheritedPermissions(inheritedGroup));
                 } else {
                     toReturn.addPermissions(groupPermissionMap.get(inheritedGroup));
                 }
