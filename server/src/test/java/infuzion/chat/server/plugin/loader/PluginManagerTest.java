@@ -18,15 +18,8 @@
 
 package infuzion.chat.server.plugin.loader;
 
-import infuzion.chat.server.mock.FakeServer;
-import org.junit.Test;
-
-import java.io.File;
-
-import static org.junit.Assert.assertTrue;
-
 public class PluginManagerTest {
-    @Test
+    /*@Test
     public void addPlugin() throws Exception {
     }
 
@@ -41,6 +34,6 @@ public class PluginManagerTest {
     @Test
     public void getPlugins() throws Exception {
 
-    }
+    }*/
 
 }
