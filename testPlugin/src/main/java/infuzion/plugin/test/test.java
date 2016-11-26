@@ -19,6 +19,7 @@
 package infuzion.plugin.test;
 
 import infuzion.chat.server.IChatClient;
+import infuzion.chat.server.Server;
 import infuzion.chat.server.command.Command;
 import infuzion.chat.server.event.IEventListener;
 import infuzion.chat.server.event.chat.MessageEvent;
@@ -38,13 +39,15 @@ public class test extends Plugin implements ICommandExecutor, IEventListener {
         System.setProperty("enabled", "1");
         System.out.println("For testing: onEnable()");
 
-        getCommandManager().registerCommand(new Command("test"), this);
-        getCommandManager().registerCommand(new Command("permissions"), this);
-        getPermissionManager().registerPermission(new Command("test"), new Permission("test.test",
-                PermissionDefault.TRUE));
-        getPermissionManager().registerPermission(new Command("permissions"),
-                new Permission("test.permission", PermissionDefault.TRUE));
-        getEventManager().registerListener(this, this);
+        if (getServer() instanceof Server) { // Not necessary to run with FakeServer
+            getCommandManager().registerCommand(new Command("test"), this);
+            getCommandManager().registerCommand(new Command("permissions"), this);
+            getPermissionManager().registerPermission(new Command("test"), new Permission("test.test",
+                    PermissionDefault.TRUE));
+            getPermissionManager().registerPermission(new Command("permissions"),
+                    new Permission("test.permission", PermissionDefault.TRUE));
+            getEventManager().registerListener(this, this);
+        }
     }
 
     @Override

@@ -37,8 +37,6 @@ public abstract class Event {
         new HandlerList().reset();
     }
 
-//    abstract HandlerList getHandlers();
-
     public String getName() {
         if (this.name == null) {
             return getClass().getSimpleName();
