@@ -27,80 +27,66 @@ import infuzion.chat.server.event.IEventListener;
 import infuzion.chat.server.event.command.PreCommandEvent;
 import infuzion.chat.server.event.connection.JoinEvent;
 import infuzion.chat.server.event.reflection.EventHandler;
-import infuzion.chat.server.permission.IPermissionManager;
-import infuzion.chat.server.permission.Permission;
-import infuzion.chat.server.permission.PermissionAttachment;
-import infuzion.chat.server.permission.PermissionDefault;
+import infuzion.chat.server.permission.*;
 
 import java.io.InputStreamReader;
-import java.util.*;
-import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DefaultPermissionManager implements IPermissionManager, IEventListener {
-    private static final Pattern uuidTest = Pattern.compile("" +
-            "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$");
-    private final Map<Command, Permission> commandPermissionMap;
-    private final Map<String, PermissionAttachment> groupPermissionMap;
-    private final Map<UUID, List<String>> chatClientGroupMap;
-    private final Map<String, List<String>> groupInheritanceMap;
-    private final Map<UUID, PermissionAttachment> permissionMap;
-    private PermissionAttachment defaultPerms;
-    private String defaultGroup;
+    private final List<IPermissionGroup> permissionGroups = new ArrayList<>();
+    private final Map<Command, Permission> commandPermissionMap = new HashMap<>();
 
     public DefaultPermissionManager(IServer server, Map<String, Map<String, List<String>>> map) {
-        this.permissionMap = new HashMap<>();
-        this.commandPermissionMap = new HashMap<>();
-        this.groupPermissionMap = new HashMap<>();
-        this.chatClientGroupMap = new HashMap<>();
-        this.groupInheritanceMap = new HashMap<>();
-        defaultPerms = new PermissionAttachment();
-        server.getEventManager().registerListener(this, null);
+        //Group or UUID "Permission" or "groups" Permissions/Groups
         if (map == null) {
-            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
-            System.out.println("YOU ARE RUNNING WITHOUT ANY PERMISSIONS! THIS CAN BE DANGEROUS");
             return;
         }
         for (Map.Entry<String, Map<String, List<String>>> entry : map.entrySet()) {
-            String groupName = entry.getKey();
             Map<String, List<String>> value = entry.getValue();
-            List<Permission> permissions = null;
-            PermissionAttachment attachment = null;
+            String name = entry.getKey();
 
-            List<String> groups = new ArrayList<>();
+            boolean defaultGroup = false;
+
+            DefaultPermissionGroup group = IPermissionGroup.fromName(name);
+            if (group == null) {
+                group = new DefaultPermissionGroup(name, new PermissionAttachment(), false);
+            }
+
+            PermissionAttachment attachment = new PermissionAttachment();
 
             if (value.containsKey("permissions")) {
-                permissions = value.get("permissions").stream().map(Permission::new).collect(Collectors.toList());
+                List<Permission> permissions = value.get("permissions").stream().map(Permission::new).collect(Collectors.toList());
                 attachment = new PermissionAttachment(permissions);
             }
-            if (value.containsKey("group")) {
-                groups.addAll(value.get("group"));
-            }
-            if (permissions != null && permissions.size() != 0) {
-                if (groupName.equals("default")) {
-                    defaultPerms = attachment;
-                } else if (uuidTest.matcher(groupName).matches()) {
-                    permissionMap.put(UUID.fromString(entry.getKey()), attachment);
-                    if (value.containsKey("group")) {
-                        chatClientGroupMap.put(UUID.fromString(entry.getKey()), value.get("group"));
+            if (value.containsKey("default")) {
+                if (value.get("default").size() > 0) {
+                    if (value.get("default").get(0).equalsIgnoreCase("true")) {
+                        defaultGroup = true;
                     }
-                } else {
-                    groupPermissionMap.put(groupName, attachment);
                 }
             }
 
-            if (groups.size() != 0) {
-                groupInheritanceMap.put(groupName, groups);
+            if (value.containsKey("group")) {
+                for (String groupName : value.get("group")) {
+                    IPermissionGroup permissionGroup = IPermissionGroup.fromName(groupName);
+                    if (permissionGroup == null) {
+                        permissionGroup = new DefaultPermissionGroup(groupName, new PermissionAttachment(), false);
+                    }
+                    group.addGroup(permissionGroup);
+                }
             }
+
+            group.setDefault(defaultGroup);
+            group.setPermissions(attachment);
+            permissionGroups.add(group);
         }
 
-        if (defaultPerms.getPermissions().size() > 0) {
-            defaultPerms = combineInheritedPermissions("default");
-        }
     }
+
 
     public DefaultPermissionManager(IServer server, InputStreamReader permissionFileReader) throws YamlException {
         //noinspection unchecked
@@ -136,6 +122,7 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
             return;
         }
         Command command = new Command(event.getCommand());
+
         if (commandPermissionMap.containsKey(command)) {
             Permission permission = commandPermissionMap.get(command);
             if (hasPermission(permission, sender)) {
@@ -146,6 +133,16 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
         event.getSender().sendMessage(noPermissionMessage());
     }
 
+    private PermissionAttachment getDefault() {
+        PermissionAttachment temp = new PermissionAttachment();
+        for (IPermissionGroup group : permissionGroups) {
+            if (group.isDefault()) {
+                temp.addPermissions(group.getCalculatedPermissions());
+            }
+        }
+        return temp;
+    }
+
     @Override
     public void registerPermission(Command command, Permission permission) {
         commandPermissionMap.put(command, permission);
@@ -153,30 +150,10 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
 
     @Override
     public PermissionAttachment getPermissionAttachment(IChatClient chatClient) {
-        PermissionAttachment toReturn = new PermissionAttachment();
-        if (permissionMap.containsKey(chatClient.getUuid())) {
-            List<String> groups = chatClientGroupMap.getOrDefault(chatClient.getUuid(), new ArrayList<>());
-            for (String group : groups) {
-                toReturn.addPermissions(combineInheritedPermissions(group));
-            }
-            toReturn.addPermissions(permissionMap.get(chatClient.getUuid()));
-            toReturn.addPermissions(defaultPerms);
+        IPermissionGroup group = IPermissionGroup.fromName(chatClient.getUuid().toString());
+        if (group != null) {
+            return group.getCalculatedPermissions();
         }
-        return toReturn;
-    }
-
-    private PermissionAttachment combineInheritedPermissions(String group) {
-        PermissionAttachment toReturn =
-                (groupPermissionMap.containsKey(group)) ? groupPermissionMap.get(group) : new PermissionAttachment();
-        if (groupInheritanceMap.containsKey(group)) {
-            for (String inheritedGroup : groupInheritanceMap.get(group)) {
-                if (groupInheritanceMap.containsKey(inheritedGroup)) {
-                    toReturn.addPermissions(combineInheritedPermissions(inheritedGroup));
-                } else {
-                    toReturn.addPermissions(groupPermissionMap.get(inheritedGroup));
-                }
-            }
-        }
-        return toReturn;
+        return getDefault();
     }
 }

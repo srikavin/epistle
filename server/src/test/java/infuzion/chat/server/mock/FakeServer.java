@@ -52,7 +52,7 @@ public class FakeServer implements IServer {
 
     @Override
     public IPermissionManager getPermissionManager() {
-        return null;
+        return new FakePermissionManager();
     }
 
     @Override

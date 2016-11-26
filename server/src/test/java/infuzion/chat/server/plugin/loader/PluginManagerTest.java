@@ -22,7 +22,6 @@ import infuzion.chat.server.mock.FakeServer;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.Map;
 
 import static org.junit.Assert.assertTrue;
 
@@ -35,13 +34,7 @@ public class PluginManagerTest {
     public void addAllPlugins() throws Exception {
         PluginManager pl = new PluginManager(new FakeServer());
         pl.addAllPlugins(new File(getClass().getClassLoader().getResource("plugins/").toURI()));
-
-        System.setProperty("test", "1");
         pl.enable();
-        for (Map.Entry<Object, Object> e : System.getProperties().entrySet()) {
-            System.out.print(e.getKey() + " : ");
-            System.out.println(e.getValue());
-        }
         assertTrue(System.getProperty("enabled").equals("1"));
     }
 

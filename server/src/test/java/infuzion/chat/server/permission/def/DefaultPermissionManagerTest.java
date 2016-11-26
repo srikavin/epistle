@@ -24,17 +24,20 @@ import infuzion.chat.server.event.command.PreCommandEvent;
 import infuzion.chat.server.mock.FakeClient;
 import infuzion.chat.server.mock.FakeServer;
 import infuzion.chat.server.mock.FakeServerClient;
+import infuzion.chat.server.permission.IPermissionGroup;
 import infuzion.chat.server.permission.Permission;
 import infuzion.chat.server.permission.PermissionAttachment;
+import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class DefaultPermissionManagerTest {
     @Test
@@ -160,6 +163,17 @@ public class DefaultPermissionManagerTest {
         assertTrue("Event should be canceled", shouldBeCanceled.isCanceled());
     }
 
+    @Before
+    public void resetStatic() throws Exception {
+        Field field = IPermissionGroup.class.getDeclaredField("groups");
+        field.setAccessible(true);
+        Field modifiersField = Field.class.getDeclaredField("modifiers");
+        modifiersField.setAccessible(true);
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+
+        field.set(null, new ArrayList<DefaultPermissionGroup>());
+    }
+
     @Test
     public void getPermissionAttachment() throws Exception {
         IServer server = new FakeServer();
@@ -167,7 +181,7 @@ public class DefaultPermissionManagerTest {
         IChatClient fakeClient = new FakeClient();
 
         PermissionAttachment shouldBeEmpty = defaultPermissionManager.getPermissionAttachment(fakeClient);
-        assertTrue("Should be empty", shouldBeEmpty.getPermissions().size() == 0);
+        assertEquals("Should be empty", 0, shouldBeEmpty.getPermissions().size());
     }
 
 }
