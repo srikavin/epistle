@@ -19,6 +19,7 @@
 package infuzion.chat.server.plugin.loader;
 
 import infuzion.chat.server.mock.FakeServer;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
@@ -52,8 +53,15 @@ public class PluginManagerTest {
 
     private PluginManager createAndAddAllPlugins() throws Exception {
         PluginManager pl = new PluginManager(new FakeServer());
-        pl.addAllPlugins(new File(getClass().getClassLoader().getResource("plugins/").toURI()));
+        pl.addAllPlugins(new File(getClass().getResource("/plugins" + File.separator).toURI()));
         return pl;
+    }
+
+    @Before
+    public void reset() throws Exception {
+        System.setProperty("enabled", "0");
+        System.setProperty("loaded", "0");
+        System.setProperty("disabled", "0");
     }
 
     @Test
