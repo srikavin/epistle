@@ -24,6 +24,8 @@ import infuzion.chat.server.plugin.command.ICommandExecutor;
 
 public class TpsCommand implements ICommandExecutor {
 
+    private final static String tpsTemplate = "The server is running at %d ticks per second.";
+    private final static String totalTpsTemplate = "The server has run for a total of %d ticks.";
     private final IServer server;
 
     public TpsCommand(IServer server) {
@@ -33,13 +35,19 @@ public class TpsCommand implements ICommandExecutor {
     @Override
     public void onCommand(String commandName, String[] args, IChatClient client) {
         if (commandName.equalsIgnoreCase("tps")) {
-            client.sendMessage("The server is running at " + server.getTps() + " ticks per second.");
-            client.sendMessage("The server has run for a total of " + server.getTotalTps() + " ticks.");
+            if (args.length > 0 && args[0].equalsIgnoreCase("help")) {
+                for (String e : getHelp()) {
+                    client.sendMessage(e);
+                }
+            } else {
+                client.sendMessage(String.format(tpsTemplate, server.getTps()));
+                client.sendMessage(String.format(totalTpsTemplate, server.getTotalTps()));
+            }
         }
     }
 
     @Override
     public String[] getHelp() {
-        return new String[0];
+        return new String[]{"Usage: /tps"};
     }
 }

@@ -23,10 +23,15 @@ import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.IChatRoom;
 import infuzion.chat.server.permission.PermissionAttachment;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class FakeClient implements IChatClient {
+    public boolean sendMessageCalled = false;
+    public List<String> receivedMessages = new ArrayList<>();
     private PermissionAttachment permissions;
+    private IChatRoom chatRoom;
 
     @Override
     public void kick(String message) {
@@ -45,17 +50,23 @@ public class FakeClient implements IChatClient {
 
     @Override
     public void sendMessage(String message) {
+        sendMessageCalled = true;
+        receivedMessages.add(message);
+    }
 
+    public void reset() {
+        sendMessageCalled = false;
+        receivedMessages.clear();
     }
 
     @Override
     public IChatRoom getChatRoom() {
-        return null;
+        return chatRoom;
     }
 
     @Override
     public void setChatRoom(IChatRoom IChatRoom) {
-
+        chatRoom = IChatRoom;
     }
 
     @Override

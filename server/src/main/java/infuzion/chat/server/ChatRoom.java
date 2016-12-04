@@ -39,7 +39,7 @@ public class ChatRoom implements IChatRoom {
         return IChatRoomManager;
     }
 
-    static void setChatRoomManager(IChatRoomManager IChatRoomManager) {
+    public static void setChatRoomManager(IChatRoomManager IChatRoomManager) {
         ChatRoom.IChatRoomManager = IChatRoomManager;
     }
 

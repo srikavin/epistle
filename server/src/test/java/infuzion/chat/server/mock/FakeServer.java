@@ -26,6 +26,9 @@ import infuzion.chat.server.plugin.loader.IPluginManager;
 
 
 public class FakeServer implements IServer {
+    private int tps = -1;
+    private long totalTPS = -1;
+
     @Override
     public void reload() {
     }
@@ -33,6 +36,11 @@ public class FakeServer implements IServer {
     @Override
     public void stop() {
 
+    }
+
+    public void setTps(int tps, long totalTPS) {
+        this.tps = tps;
+        this.totalTPS = totalTPS;
     }
 
     @Override
@@ -62,11 +70,11 @@ public class FakeServer implements IServer {
 
     @Override
     public int getTps() {
-        return 0;
+        return tps;
     }
 
     @Override
     public long getTotalTps() {
-        return 0;
+        return totalTPS;
     }
 }

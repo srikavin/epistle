@@ -25,7 +25,7 @@ import java.util.List;
 public class ChatRoomManager implements IChatRoomManager {
     private final List<IChatRoom> IChatRooms = new ArrayList<>();
 
-    ChatRoomManager() {
+    public ChatRoomManager() {
         IChatRooms.add(new ChatRoom("default"));
         ChatRoom.setChatRoomManager(this);
     }
@@ -100,5 +100,17 @@ public class ChatRoomManager implements IChatRoomManager {
     @Override
     public void kickClient(IChatClient IChatClient) {
         kickClient(IChatClient, "");
+    }
+
+    @Override
+    public IChatRoom createChatRoom(String name) {
+        ChatRoom r = new ChatRoom(name);
+        addChatRoom(r);
+        return r;
+    }
+
+    @Override
+    public List<IChatRoom> getChatRooms() {
+        return IChatRooms;
     }
 }

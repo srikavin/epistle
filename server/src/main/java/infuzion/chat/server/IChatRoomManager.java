@@ -18,6 +18,8 @@
 
 package infuzion.chat.server;
 
+import java.util.List;
+
 public interface IChatRoomManager {
     void addChatRoom(IChatRoom IChatRoom);
 
@@ -31,7 +33,7 @@ public interface IChatRoomManager {
 
     void sendMessageAll(String message, IChatClient client);
 
-    void sendMessageAll(String message, IChatClient client, IChatRoom IChatRoom);
+    void sendMessageAll(String message, IChatClient client, IChatRoom chatRoom);
 
     void moveClient(IChatClient client, IChatRoom newRoom);
 
@@ -40,4 +42,8 @@ public interface IChatRoomManager {
     void kickClient(IChatClient IChatClient, String message);
 
     void kickClient(IChatClient IChatClient);
+
+    IChatRoom createChatRoom(String name);
+
+    List<IChatRoom> getChatRooms();
 }
