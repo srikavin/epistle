@@ -63,7 +63,7 @@ public class ChatClient implements IChatClient {
     }
 
     public void kick(String message) {
-        sendMessage(message);
+        sendData(message, DataType.Kick);
         clientSocketMap.remove(socket);
         clientStringMap.remove(name);
         try {
@@ -114,11 +114,6 @@ public class ChatClient implements IChatClient {
         this.prefix = prefix;
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof IChatClient && this.uuid.equals(((IChatClient) obj).getUuid());
-    }
-
     public PermissionAttachment getPermissionAttachment() {
         return permissionAttachment;
     }
@@ -130,5 +125,15 @@ public class ChatClient implements IChatClient {
     @Override
     public boolean isConsole() {
         return false;
+    }
+
+    @Override
+    public Socket getSocket() {
+        return socket;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof IChatClient && this.uuid.equals(((IChatClient) obj).getUuid());
     }
 }

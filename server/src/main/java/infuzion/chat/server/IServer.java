@@ -23,6 +23,8 @@ import infuzion.chat.server.event.IEventManager;
 import infuzion.chat.server.permission.IPermissionManager;
 import infuzion.chat.server.plugin.loader.IPluginManager;
 
+import java.util.List;
+
 public interface IServer {
     void reload();
 
@@ -41,4 +43,6 @@ public interface IServer {
     int getTps();
 
     long getTotalTps();
+
+    List<IChatClient> getConnectedClients();
 }

@@ -21,6 +21,7 @@ package infuzion.chat.server;
 import infuzion.chat.common.DataType;
 import infuzion.chat.server.permission.PermissionAttachment;
 
+import java.net.Socket;
 import java.util.UUID;
 
 public class ServerChatClient implements IChatClient {
@@ -87,5 +88,10 @@ public class ServerChatClient implements IChatClient {
     @Override
     public boolean isConsole() {
         return true;
+    }
+
+    @Override
+    public Socket getSocket() {
+        return null;
     }
 }

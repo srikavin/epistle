@@ -21,6 +21,7 @@ package infuzion.chat.server;
 import infuzion.chat.common.DataType;
 import infuzion.chat.server.permission.PermissionAttachment;
 
+import java.net.Socket;
 import java.util.UUID;
 
 public interface IChatClient {
@@ -47,4 +48,6 @@ public interface IChatClient {
     void setPermissionAttachment(PermissionAttachment attachment);
 
     boolean isConsole();
+
+    Socket getSocket();
 }

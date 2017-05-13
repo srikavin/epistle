@@ -19,9 +19,8 @@
   -->
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.60"
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.111"
       fx:controller="infuzion.chat.client.controller.MainChatController">
     <MenuBar VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="File">
@@ -32,13 +31,21 @@
         </Menu>
     </MenuBar>
     <AnchorPane prefHeight="375.0" prefWidth="678.0" VBox.vgrow="ALWAYS">
-        <ScrollPane prefHeight="346.0" prefWidth="640.0">
-            <TextArea fx:id="chatTextArea" editable="false"
-                      prefHeight="342.0" prefWidth="638.0" stylesheets="@mainChat.fxml.css"/>
+        <ScrollPane fitToHeight="true" fitToWidth="true" maxHeight="1.7976931348623157E308"
+                    maxWidth="1.7976931348623157E308" prefHeight="346.0" prefWidth="640.0"
+                    style="-fx-text-box-border: transparent; -fx-focus-color: transparent;"
+                    AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0">
+            <TextArea fx:id="chatTextArea" editable="false" layoutX="1.0" layoutY="1.0"
+                      maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                      minWidth="-Infinity" prefHeight="337.0" prefWidth="637.0"
+                      style="-fx-text-box-border: transparent; -fx-focus-color: transparent;"
+                      stylesheets="@mainChat.fxml.css"/>
         </ScrollPane>
-        <TextField fx:id="inputField" layoutY="349.0" onAction="#onChat" prefHeight="25.0" prefWidth="543.0"
-                   promptText="Message to Send"/>
+        <TextField fx:id="inputField" layoutY="349.0" onAction="#onChat" prefHeight="25.0" prefWidth="532.0"
+                   promptText="Message to Send" AnchorPane.bottomAnchor="6.0" AnchorPane.leftAnchor="2.0"/>
         <Button fx:id="chatButton" layoutX="544.0" layoutY="348.0" mnemonicParsing="false" onAction="#onChat"
-                prefHeight="25.0" prefWidth="96.0" text="Chat!"/>
+                prefHeight="25.0" prefWidth="96.0" text="Chat!" AnchorPane.bottomAnchor="5.5"
+                AnchorPane.rightAnchor="2.0"/>
     </AnchorPane>
 </VBox>

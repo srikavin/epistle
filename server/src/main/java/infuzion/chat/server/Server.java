@@ -130,8 +130,9 @@ public class Server implements Runnable, IServer {
     @SuppressWarnings("InfiniteLoopStatement")
     @Override
     public void run() {
-        try {
-            while (true) {
+        while (true) {
+            try {
+
                 long curTime = System.currentTimeMillis();
                 Iterator<Runnable> iterator = toRun.iterator();
                 while (iterator.hasNext()) {
@@ -149,10 +150,30 @@ public class Server implements Runnable, IServer {
 
                         byte messageType = e.readByte();
                         DataType mType = DataType.valueOf(messageType);
+                        if (mType == null) {
+                            System.out.println("SOMETHING CONNECTED");
+                            Socket sock = clientSockets.get(i);
+                            if (sock.isClosed()) {
+                                continue;
+                            }
+                            BufferedOutputStream output = new BufferedOutputStream(sock.getOutputStream());
+
+                            String toOutput = "Chat 2.0 server written by Infyzion\r";
+                            PrintWriter writer = new PrintWriter(output);
+                            writer.println("HTTP/1.1 " + 200 + "\r");
+                            writer.println("Content-Type: " + "text/text" + "; charset=UTF-8\r");
+                            writer.println("Content-Length: " + toOutput.getBytes("UTF-8").length + "\r\n");
+                            writer.println(toOutput);
+                            writer.flush();
+                            writer.close();
+                            clientSockets.remove(i);
+                            clientInput.remove(i);
+                            continue;
+                        }
                         String message = e.readUTF();
                         byte end = e.readByte();
 
-                        if (end != DataType.EndOfData.byteValue || mType == null) {
+                        if (end != DataType.EndOfData.byteValue) {
                             continue;
                         }
 
@@ -216,10 +237,11 @@ public class Server implements Runnable, IServer {
                     tps = 1000 / Math.toIntExact(tpsTotal / tpsCounter);
                     TimeUnit.MILLISECONDS.sleep(toSleep);
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
     }
 
     public void reload() {
@@ -280,5 +302,14 @@ public class Server implements Runnable, IServer {
     @Override
     public long getTotalTps() {
         return tpsTotal;
+    }
+
+    @Override
+    public List<IChatClient> getConnectedClients() {
+        List<IChatClient> toRet = new ArrayList<>();
+        for (Socket e : clientSockets) {
+            toRet.add(ChatClient.fromSocket(e));
+        }
+        return toRet;
     }
 }

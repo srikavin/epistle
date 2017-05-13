@@ -104,6 +104,7 @@ public class ConnectionListController {
         counter++;
     }
 
+    @FXML
     public void deleteServer(SerializableServer server) {
         servers.remove(server);
         save();

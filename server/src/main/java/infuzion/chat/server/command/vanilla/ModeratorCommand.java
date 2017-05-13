@@ -22,13 +22,18 @@ import infuzion.chat.server.ChatClient;
 import infuzion.chat.server.ChatRoom;
 import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.IServer;
+import infuzion.chat.server.event.IEventListener;
+import infuzion.chat.server.event.chat.ChatEvent;
+import infuzion.chat.server.event.reflection.EventHandler;
+import infuzion.chat.server.event.reflection.EventPriority;
 import infuzion.chat.server.permission.IPermissionManager;
 import infuzion.chat.server.plugin.command.ICommandExecutor;
 
-public class ModeratorCommand implements ICommandExecutor {
+public class ModeratorCommand implements ICommandExecutor, IEventListener {
 
     public ModeratorCommand(IServer server) {
         IPermissionManager permissionManager = server.getPermissionManager();
+        server.getEventManager().registerListener(this, null);
         permissionManager.registerPermission("kick", "chat.kick");
         permissionManager.registerPermission("ban", "chat.ban");
         permissionManager.registerPermission("mute", "chat.mute");
@@ -45,17 +50,34 @@ public class ModeratorCommand implements ICommandExecutor {
                 }
                 if (args.length >= 2) {
                     String message = "";
-                    for (int i = 1; i < args.length - 1; i++) {
+                    for (int i = 1; i < args.length; i++) {
                         message += " " + args[i];
                     }
-                    client.sendMessage("You kicked " + toKick.getName().trim() + " for " + message.trim());
+                    client.sendMessage(
+                            getPrefix() + "You kicked " + toKick.getName().trim() + " for " + message
+                                    .trim());
                     ChatRoom.getChatRoomManager().kickClient(toKick, message.trim());
+                } else {
+                    ChatRoom.getChatRoomManager().kickClient(toKick);
                 }
-                ChatRoom.getChatRoomManager().kickClient(toKick);
             } else {
                 sendHelp(client);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onChat(ChatEvent e) {
+        if (!e.isCanceled()) {
+
+        }
+    }
+
+    @Override
+    public String[] getHelp() {
+        return new String[]{
+                "/kick [name]"
+        };
     }
 
     private void sendHelp(IChatClient client) {
@@ -67,12 +89,5 @@ public class ModeratorCommand implements ICommandExecutor {
     @SuppressWarnings("SameReturnValue")
     public String getPrefix() {
         return "Moderator";
-    }
-
-    @Override
-    public String[] getHelp() {
-        return new String[]{
-                "/kick [name]"
-        };
     }
 }

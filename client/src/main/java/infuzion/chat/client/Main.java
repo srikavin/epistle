@@ -58,9 +58,20 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         try {
-            primaryStage.initStyle(StageStyle.UNIFIED);
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/incorrectSettings.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/disconnectDialog.fxml"));
+            Stage stage = new Stage();
+            Scene scene = new Scene(loader.load());
+            scene.setFill(Color.TRANSPARENT);
+            stage.setScene(scene);
+            DisconnectDialogController disconnectDialogController = loader.getController();
+            disconnectDialogController.setStage(stage);
+            disconnectDialogController.show(new RuntimeException("awewae"));
+
+
+            primaryStage.initStyle(StageStyle.DECORATED);
+
+            loader = new FXMLLoader(getClass().getResource("/incorrectSettings.fxml"));
             Scene incorrectSettingsScene = new Scene(loader.load());
 
             incorrectSettingsController = loader.getController();

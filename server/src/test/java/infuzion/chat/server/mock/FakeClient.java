@@ -23,6 +23,7 @@ import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.IChatRoom;
 import infuzion.chat.server.permission.PermissionAttachment;
 
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -97,5 +98,10 @@ public class FakeClient implements IChatClient {
     @Override
     public boolean isConsole() {
         return false;
+    }
+
+    @Override
+    public Socket getSocket() {
+        return new Socket();
     }
 }

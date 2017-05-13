@@ -18,12 +18,13 @@
   ~  */
   -->
 
+<?import javafx.geometry.Point3D?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.60"
+<?import javafx.scene.layout.*?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" prefHeight="400.0" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.111"
       fx:controller="infuzion.chat.client.controller.ConnectionListController">
-    <MenuBar VBox.vgrow="NEVER">
+    <MenuBar blendMode="SRC_ATOP" depthTest="DISABLE" prefHeight="20.0" prefWidth="642.0" translateY="1.0"
+             VBox.vgrow="NEVER">
         <Menu mnemonicParsing="false" text="File">
             <MenuItem mnemonicParsing="false" text="New"/>
             <MenuItem mnemonicParsing="false" text="Quit"/>
@@ -31,13 +32,24 @@
         <Menu mnemonicParsing="false" text="Help">
             <MenuItem mnemonicParsing="false" onAction="#about" text="About"/>
         </Menu>
+        <rotationAxis>
+            <Point3D/>
+        </rotationAxis>
     </MenuBar>
     <AnchorPane VBox.vgrow="ALWAYS">
-        <ScrollPane layoutX="-4.0" prefHeight="347.0" prefWidth="646.0">
-            <ListView fx:id="listView" focusTraversable="false" prefHeight="345.0" prefWidth="644.0"/>
+        <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="-4.0" prefHeight="347.0" prefWidth="646.0"
+                    AnchorPane.bottomAnchor="36.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0">
+            <ListView fx:id="listView" blendMode="OVERLAY" focusTraversable="false" maxHeight="1.7976931348623157E308"
+                      maxWidth="1.7976931348623157E308" prefHeight="345.0" prefWidth="644.0"/>
         </ScrollPane>
-        <Button layoutX="559.0" layoutY="348.0" mnemonicParsing="false" onAction="#newServer" text="New Server"/>
-        <Button layoutX="499.0" layoutY="348.0" mnemonicParsing="false" onAction="#launchServer" text="Launch"/>
-        <Button layoutX="456.0" layoutY="348.0" mnemonicParsing="false" onAction="#editServer" text="Edit"/>
+        <Button layoutX="7.0" layoutY="348.0" mnemonicParsing="false" onAction="#newServer" text="New Server"
+                AnchorPane.bottomAnchor="5.5" AnchorPane.leftAnchor="4.0"/>
+        <Button layoutX="561.0" layoutY="348.0" mnemonicParsing="false" onAction="#launchServer" prefHeight="25.0"
+                prefWidth="77.0" text="Launch" AnchorPane.bottomAnchor="5.5" AnchorPane.rightAnchor="4.0"/>
+        <Button layoutX="503.0" layoutY="349.0" mnemonicParsing="false" onAction="#editServer" prefHeight="25.0"
+                prefWidth="50.0" text="Edit" AnchorPane.bottomAnchor="5.5" AnchorPane.rightAnchor="90.0"/>
+        <Button layoutX="430.0" layoutY="345.0" mnemonicParsing="false" onAction="#deleteServer" prefHeight="25.0"
+                prefWidth="61.0" text="Delete" AnchorPane.bottomAnchor="5.5" AnchorPane.rightAnchor="149.0"/>
     </AnchorPane>
 </VBox>

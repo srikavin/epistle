@@ -19,6 +19,7 @@
 package infuzion.chat.client.controller;
 
 import com.sun.media.sound.InvalidFormatException;
+import infuzion.chat.client.Client;
 import infuzion.chat.client.Main;
 import infuzion.chat.client.util.SerializableServer;
 import javafx.event.ActionEvent;
@@ -95,17 +96,14 @@ public class ConnectionOptionsController {
 
     public boolean connect(String name, String ip, int port) {
         try {
-            Main.startClientThread(name, ip, port);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/mainChat.fxml"));
-        try {
+            Client client = Main.startClientThread(name, ip, port);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/mainChat.fxml"));
             Parent root = loader.load();
             stage.setScene(new Scene(root));
             stage.setTitle("Chat");
             Main.mainChatController = loader.getController();
+            Main.mainChatController.init(client, stage.getScene());
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
             return false;

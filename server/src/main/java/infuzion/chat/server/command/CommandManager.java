@@ -40,6 +40,7 @@ public class CommandManager implements ICommandManager {
         addCommandExecutor(new ReloadCommand(server));
         addCommandExecutor(new StopCommand(server));
         addCommandExecutor(new TpsCommand(server));
+        addCommandExecutor(new ClientInfoCommand(server));
     }
 
     @Override

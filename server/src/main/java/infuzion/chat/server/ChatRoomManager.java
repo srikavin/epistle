@@ -99,7 +99,7 @@ public class ChatRoomManager implements IChatRoomManager {
 
     @Override
     public void kickClient(IChatClient IChatClient) {
-        kickClient(IChatClient, "");
+        kickClient(IChatClient, "an unspecified reason.");
     }
 
     @Override

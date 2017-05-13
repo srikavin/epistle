@@ -18,16 +18,24 @@
 
 package infuzion.chat.server.mock;
 
+import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.IServer;
 import infuzion.chat.server.command.ICommandManager;
 import infuzion.chat.server.event.IEventManager;
 import infuzion.chat.server.permission.IPermissionManager;
 import infuzion.chat.server.plugin.loader.IPluginManager;
 
+import java.util.List;
+
 
 public class FakeServer implements IServer {
+    public boolean stopCalled = false;
     private int tps = -1;
     private long totalTPS = -1;
+
+    public void reset() {
+        stopCalled = false;
+    }
 
     @Override
     public void reload() {
@@ -35,7 +43,7 @@ public class FakeServer implements IServer {
 
     @Override
     public void stop() {
-
+        stopCalled = true;
     }
 
     public void setTps(int tps, long totalTPS) {
@@ -76,5 +84,10 @@ public class FakeServer implements IServer {
     @Override
     public long getTotalTps() {
         return totalTPS;
+    }
+
+    @Override
+    public List<IChatClient> getConnectedClients() {
+        return null;
     }
 }

@@ -22,21 +22,56 @@ import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.command.Command;
 
 public interface IPermissionManager {
+    /**
+     * Checks if the specified chat client has the specified permission
+     *
+     * @param permission Permission as a string
+     * @param chatClient ChatClient to check
+     * @return A boolean indicating if the client has the specified permission
+     */
     default boolean hasPermission(String permission, IChatClient chatClient) {
         return hasPermission(new Permission(permission), chatClient);
     }
 
+    /**
+     * Checks if the specified chat client has the specified permission
+     *
+     * @param permission Permission
+     * @param chatClient ChatClient to check
+     * @return A boolean indicating if the client has the specified permission
+     */
     boolean hasPermission(Permission permission, IChatClient chatClient);
 
-
+    /**
+     * Registers a permission and a command
+     * If a client does not have the permission when executing the command, the command will not be executed
+     * @param command The command to register
+     * @param permission The permission to register
+     */
     void registerPermission(Command command, Permission permission);
 
+    /**
+     * Registers a permission and a command
+     * If a client does not have the permission when executing the command, the command will not be executed
+     * @param command The command to register
+     * @param permission The permission to register
+     */
     default void registerPermission(String command, String permission) {
         registerPermission(new Command(command), new Permission(permission));
     }
 
+    /**
+     * Gets the permission attachment of a client
+     * @implNote This should update the permission attachment of the chatclient as well as returning it
+     * @param chatClient Chat client to get the permission attachment of
+     * @return The permission attachment of the specified chat client
+     */
     PermissionAttachment getPermissionAttachment(IChatClient chatClient);
 
+    /**
+     * Gets the message to be sent when a client does not have permission
+     * @return A string containing the message to be sent when a client does not have permission
+     */
     @SuppressWarnings("SameReturnValue")
     default String noPermissionMessage() {
         return "Sorry, you are not allowed to perform that action.";

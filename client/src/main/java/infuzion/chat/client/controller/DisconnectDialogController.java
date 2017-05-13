@@ -48,6 +48,7 @@ public class DisconnectDialogController {
         error.printStackTrace(pw);
         detailsLabel.setText(sw.toString()); // stack trace as a string
         detailsPane.heightProperty().addListener(((observable, oldValue, newValue) -> stage.sizeToScene()));
+        stage.setResizable(false);
         stage.show();
     }
 

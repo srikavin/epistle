@@ -28,6 +28,7 @@ public class StopCommand implements ICommandExecutor {
 
     public StopCommand(Server server) {
         this.server = server;
+        server.getPermissionManager().registerPermission("stop", "chat.stop");
     }
 
     @Override
