@@ -1,38 +1,37 @@
 /*
+ * Copyright 2018 Srikavin Ramkumar
  *
- *  *  Copyright 2016 Infuzion
- *  *
- *  *    Licensed under the Apache License, Version 2.0 (the "License");
- *  *    you may not use this file except in compliance with the License.
- *  *    You may obtain a copy of the License at
- *  *
- *  *        http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  *    Unless required by applicable law or agreed to in writing, software
- *  *    distributed under the License is distributed on an "AS IS" BASIS,
- *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  *    See the License for the specific language governing permissions and
- *  *    limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package infuzion.plugin.test;
 
-import infuzion.chat.server.IChatClient;
 import infuzion.chat.server.Server;
-import infuzion.chat.server.command.Command;
-import infuzion.chat.server.event.IEventListener;
+import infuzion.chat.server.command.DefaultCommand;
 import infuzion.chat.server.event.chat.MessageEvent;
 import infuzion.chat.server.event.command.PreCommandEvent;
 import infuzion.chat.server.event.connection.JoinEvent;
 import infuzion.chat.server.event.reflection.EventHandler;
-import infuzion.chat.server.permission.Permission;
-import infuzion.chat.server.permission.PermissionAttachment;
-import infuzion.chat.server.permission.PermissionDefault;
-import infuzion.chat.server.plugin.Plugin;
-import infuzion.chat.server.plugin.command.ICommandExecutor;
+import infuzion.chat.server.permission.DefaultPermission;
+import me.infuzion.chat.server.api.IChatClient;
+import me.infuzion.chat.server.api.command.ICommandExecutor;
+import me.infuzion.chat.server.api.event.IEventListener;
+import me.infuzion.chat.server.api.permission.Permission;
+import me.infuzion.chat.server.api.permission.PermissionAttachment;
+import me.infuzion.chat.server.api.permission.PermissionDefault;
+import me.infuzion.chat.server.api.plugin.BasePlugin;
 
-public class test extends Plugin implements ICommandExecutor, IEventListener {
+public class test extends BasePlugin implements ICommandExecutor, IEventListener {
 
     @Override
     public void onEnable() {
@@ -40,12 +39,12 @@ public class test extends Plugin implements ICommandExecutor, IEventListener {
         System.out.println("For testing: onEnable()");
 
         if (getServer() instanceof Server) { // Not necessary to run with FakeServer
-            getCommandManager().registerCommand(new Command("test"), this);
-            getCommandManager().registerCommand(new Command("permissions"), this);
-            getPermissionManager().registerPermission(new Command("test"), new Permission("test.test",
+            getCommandManager().registerCommand(new DefaultCommand("test"), this);
+            getCommandManager().registerCommand(new DefaultCommand("permissions"), this);
+            getPermissionManager().registerPermission(new DefaultCommand("test"), new DefaultPermission("test.test",
                     PermissionDefault.TRUE));
-            getPermissionManager().registerPermission(new Command("permissions"),
-                    new Permission("test.permission", PermissionDefault.TRUE));
+            getPermissionManager().registerPermission(new DefaultCommand("permissions"),
+                    new DefaultPermission("test.permission", PermissionDefault.TRUE));
             getEventManager().registerListener(this, this);
         }
     }

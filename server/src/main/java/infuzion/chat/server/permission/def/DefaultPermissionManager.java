@@ -1,33 +1,34 @@
 /*
+ * Copyright 2018 Srikavin Ramkumar
  *
- *  *  Copyright 2016 Infuzion
- *  *
- *  *    Licensed under the Apache License, Version 2.0 (the "License");
- *  *    you may not use this file except in compliance with the License.
- *  *    You may obtain a copy of the License at
- *  *
- *  *        http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  *    Unless required by applicable law or agreed to in writing, software
- *  *    distributed under the License is distributed on an "AS IS" BASIS,
- *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  *    See the License for the specific language governing permissions and
- *  *    limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package infuzion.chat.server.permission.def;
 
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
-import infuzion.chat.server.IChatClient;
-import infuzion.chat.server.IServer;
-import infuzion.chat.server.command.Command;
-import infuzion.chat.server.event.IEventListener;
+import infuzion.chat.server.command.DefaultCommand;
 import infuzion.chat.server.event.command.PreCommandEvent;
 import infuzion.chat.server.event.connection.JoinEvent;
 import infuzion.chat.server.event.reflection.EventHandler;
-import infuzion.chat.server.permission.*;
+import infuzion.chat.server.permission.DefaultPermission;
+import infuzion.chat.server.permission.DefaultPermissionAttachment;
+import me.infuzion.chat.server.api.IChatClient;
+import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.command.Command;
+import me.infuzion.chat.server.api.event.IEventListener;
+import me.infuzion.chat.server.api.permission.*;
 
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -51,16 +52,16 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
 
             boolean defaultGroup = false;
 
-            DefaultPermissionGroup group = IPermissionGroup.fromName(name);
+            IPermissionGroup group = IPermissionGroup.fromName(name);
             if (group == null) {
-                group = new DefaultPermissionGroup(name, new PermissionAttachment(), false);
+                group = new DefaultPermissionGroup(name, new DefaultPermissionAttachment(), false);
             }
 
-            PermissionAttachment attachment = new PermissionAttachment();
+            PermissionAttachment attachment = new DefaultPermissionAttachment();
 
             if (value.containsKey("permissions")) {
-                List<Permission> permissions = value.get("permissions").stream().map(Permission::new).collect(Collectors.toList());
-                attachment = new PermissionAttachment(permissions);
+                List<Permission> permissions = value.get("permissions").stream().map(DefaultPermission::new).collect(Collectors.toList());
+                attachment = new DefaultPermissionAttachment(permissions);
             }
             if (value.containsKey("default")) {
                 if (value.get("default").size() > 0) {
@@ -74,7 +75,7 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
                 for (String groupName : value.get("group")) {
                     IPermissionGroup permissionGroup = IPermissionGroup.fromName(groupName);
                     if (permissionGroup == null) {
-                        permissionGroup = new DefaultPermissionGroup(groupName, new PermissionAttachment(), false);
+                        permissionGroup = new DefaultPermissionGroup(groupName, new DefaultPermissionAttachment(), false);
                     }
                     group.addGroup(permissionGroup);
                 }
@@ -87,13 +88,11 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
 
     }
 
-
     public DefaultPermissionManager(IServer server, InputStreamReader permissionFileReader) throws YamlException {
         //noinspection unchecked
         this(server, (Map<String, Map<String, List<String>>>) new YamlReader(permissionFileReader).read());
     }
 
-    @Override
     public boolean hasPermission(Permission permission, IChatClient chatClient) {
         if (chatClient.isConsole()) {
             return true;
@@ -121,7 +120,7 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
         if (sender.isConsole()) {
             return;
         }
-        Command command = new Command(event.getCommand());
+        Command command = new DefaultCommand(event.getCommand());
 
         if (commandPermissionMap.containsKey(command)) {
             Permission permission = commandPermissionMap.get(command);
@@ -134,7 +133,7 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     }
 
     private PermissionAttachment getDefault() {
-        PermissionAttachment temp = new PermissionAttachment();
+        PermissionAttachment temp = new DefaultPermissionAttachment();
         for (IPermissionGroup group : permissionGroups) {
             if (group.isDefault()) {
                 temp.addPermissions(group.getCalculatedPermissions());
@@ -146,6 +145,16 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     @Override
     public void registerPermission(Command command, Permission permission) {
         commandPermissionMap.put(command, permission);
+    }
+
+    @Override
+    public boolean hasPermission(String permission, IChatClient chatClient) {
+        return hasPermission(new DefaultPermission(permission), chatClient);
+    }
+
+    @Override
+    public void registerPermission(String command, String permission) {
+        registerPermission(new DefaultCommand(command), new DefaultPermission(permission));
     }
 
     @Override

@@ -1,32 +1,34 @@
 /*
+ * Copyright 2018 Srikavin Ramkumar
  *
- *  *  Copyright 2016 Infuzion
- *  *
- *  *    Licensed under the Apache License, Version 2.0 (the "License");
- *  *    you may not use this file except in compliance with the License.
- *  *    You may obtain a copy of the License at
- *  *
- *  *        http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  *    Unless required by applicable law or agreed to in writing, software
- *  *    distributed under the License is distributed on an "AS IS" BASIS,
- *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  *    See the License for the specific language governing permissions and
- *  *    limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package infuzion.chat.server.event;
 
-import infuzion.chat.server.IServer;
 import infuzion.chat.server.event.chat.ChatEvent;
 import infuzion.chat.server.event.chat.MessageEvent;
 import infuzion.chat.server.event.command.CommandEvent;
 import infuzion.chat.server.event.command.PreCommandEvent;
+import infuzion.chat.server.event.reflection.DefaultListener;
 import infuzion.chat.server.event.reflection.EventHandler;
-import infuzion.chat.server.event.reflection.EventPriority;
-import infuzion.chat.server.event.reflection.Listener;
-import infuzion.chat.server.plugin.Plugin;
+import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.event.Event;
+import me.infuzion.chat.server.api.event.IEventListener;
+import me.infuzion.chat.server.api.event.IEventManager;
+import me.infuzion.chat.server.api.event.reflection.EventPriority;
+import me.infuzion.chat.server.api.event.reflection.Listener;
+import me.infuzion.chat.server.api.plugin.Plugin;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -41,7 +43,7 @@ public class EventManager implements IEventManager {
     }
 
     private void registerDefaultEvents() {
-        registerEvent(Event.class);
+        registerEvent(BaseEvent.class);
         registerEvent(ChatEvent.class);
         registerEvent(MessageEvent.class);
         registerEvent(CommandEvent.class);
@@ -49,7 +51,7 @@ public class EventManager implements IEventManager {
     }
 
     public void registerEvent(Class<? extends Event> event) {
-        if (Event.class.isAssignableFrom(event) && !eventTypes.contains(event)) {
+        if (BaseEvent.class.isAssignableFrom(event) && !eventTypes.contains(event)) {
             eventTypes.add(event);
         }
     }
@@ -67,9 +69,9 @@ public class EventManager implements IEventManager {
             }
             Class listenerMethodClass = method.getParameterTypes()[0];
 
-            if (Event.class.isAssignableFrom(listenerMethodClass)) {
+            if (BaseEvent.class.isAssignableFrom(listenerMethodClass)) {
                 eventTypes.stream().filter(eventType -> eventType.isAssignableFrom(listenerMethodClass)).forEach(eventType ->
-                        Event.getAllHandlers().add(new Listener(plugin, priority, eventType, method, listener)));
+                        Event.getAllHandlers().add(new DefaultListener(plugin, priority, eventType, method, listener)));
             }
         }
 

@@ -1,25 +1,25 @@
 /*
+ * Copyright 2018 Srikavin Ramkumar
  *
- *  *  Copyright 2016 Infuzion
- *  *
- *  *    Licensed under the Apache License, Version 2.0 (the "License");
- *  *    you may not use this file except in compliance with the License.
- *  *    You may obtain a copy of the License at
- *  *
- *  *        http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  *    Unless required by applicable law or agreed to in writing, software
- *  *    distributed under the License is distributed on an "AS IS" BASIS,
- *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  *    See the License for the specific language governing permissions and
- *  *    limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package infuzion.chat.server.plugin.loader;
 
-import infuzion.chat.server.IServer;
-import infuzion.chat.server.plugin.Plugin;
+import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.plugin.BasePlugin;
+import me.infuzion.chat.server.api.plugin.Plugin;
+import me.infuzion.chat.server.api.plugin.loader.IPluginManager;
 
 import java.io.File;
 import java.net.URL;
@@ -39,7 +39,7 @@ public class PluginManager implements IPluginManager {
     public void addPlugin(File file) throws Exception {
         PluginDescriptionFile descriptionFile = new PluginDescriptionFile(new JarFile(file));
         ClassLoader loader = URLClassLoader.newInstance(new URL[]{file.toURI().toURL()});
-        Plugin plugin = (Plugin) loader.loadClass(descriptionFile.getMainClass()).newInstance();
+        BasePlugin plugin = (BasePlugin) loader.loadClass(descriptionFile.getMainClass()).newInstance();
         plugin.init(descriptionFile, server);
         plugin.onLoad();
         System.out.println("Successfully loaded " + descriptionFile.getName() + " v" + descriptionFile.getVersion());

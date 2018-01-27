@@ -1,32 +1,31 @@
 /*
+ * Copyright 2018 Srikavin Ramkumar
  *
- *  *  Copyright 2016 Infuzion
- *  *
- *  *    Licensed under the Apache License, Version 2.0 (the "License");
- *  *    you may not use this file except in compliance with the License.
- *  *    You may obtain a copy of the License at
- *  *
- *  *        http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  *    Unless required by applicable law or agreed to in writing, software
- *  *    distributed under the License is distributed on an "AS IS" BASIS,
- *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  *    See the License for the specific language governing permissions and
- *  *    limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package infuzion.chat.server.permission.def;
 
-import infuzion.chat.server.IChatClient;
-import infuzion.chat.server.IServer;
 import infuzion.chat.server.event.command.PreCommandEvent;
 import infuzion.chat.server.mock.FakeClient;
 import infuzion.chat.server.mock.FakeServer;
 import infuzion.chat.server.mock.FakeServerClient;
-import infuzion.chat.server.permission.IPermissionGroup;
-import infuzion.chat.server.permission.Permission;
-import infuzion.chat.server.permission.PermissionAttachment;
+import infuzion.chat.server.permission.DefaultPermission;
+import infuzion.chat.server.permission.DefaultPermissionAttachment;
+import me.infuzion.chat.server.api.IChatClient;
+import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.permission.IPermissionGroup;
+import me.infuzion.chat.server.api.permission.PermissionAttachment;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +40,7 @@ import static org.junit.Assert.*;
 
 public class DefaultPermissionManagerTest {
     @Test
-    public void hasPermission() throws Exception {
+    public void hasPermission() {
         IServer server = new FakeServer();
 
         Map<String, Map<String, List<String>>> map = new HashMap<>();
@@ -51,11 +50,11 @@ public class DefaultPermissionManagerTest {
 
         assertFalse(defaultPermissionManager.hasPermission("should.not.have.this.permission", fakeClient));
 
-        PermissionAttachment pA = new PermissionAttachment();
-        pA.addPermission(new Permission("should.have.this.permission"));
+        PermissionAttachment pA = new DefaultPermissionAttachment();
+        pA.addPermission(new DefaultPermission("should.have.this.permission"));
         fakeClient.setPermissionAttachment(pA);
 
-        assertTrue(defaultPermissionManager.hasPermission(new Permission("should.have.this.permission"),
+        assertTrue(defaultPermissionManager.hasPermission(new DefaultPermission("should.have.this.permission"),
                 fakeClient));
 
         IChatClient fakeServerClient = new FakeServerClient();
@@ -64,7 +63,7 @@ public class DefaultPermissionManagerTest {
     }
 
     @Test
-    public void hasPermissionGroupTest() throws Exception {
+    public void hasPermissionGroupTest() {
         Map<String, Map<String, List<String>>> map = new HashMap<>();
         IChatClient fakeClient = new FakeClient();
 
@@ -96,7 +95,7 @@ public class DefaultPermissionManagerTest {
     }
 
     @Test
-    public void hasPermissionGroupInheritanceTest() throws Exception {
+    public void hasPermissionGroupInheritanceTest() {
         Map<String, Map<String, List<String>>> map = new HashMap<>();
         IChatClient fakeClient = new FakeClient();
 
@@ -150,7 +149,7 @@ public class DefaultPermissionManagerTest {
     }
 
     @Test
-    public void registerPermission() throws Exception {
+    public void registerPermission() {
         IServer server = new FakeServer();
         DefaultPermissionManager defaultPermissionManager = new DefaultPermissionManager(server, new HashMap<>());
         IChatClient fakeClient = new FakeClient();
@@ -175,7 +174,7 @@ public class DefaultPermissionManagerTest {
     }
 
     @Test
-    public void getPermissionAttachment() throws Exception {
+    public void getPermissionAttachment() {
         IServer server = new FakeServer();
         DefaultPermissionManager defaultPermissionManager = new DefaultPermissionManager(server, new HashMap<>());
         IChatClient fakeClient = new FakeClient();
