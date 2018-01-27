@@ -75,14 +75,13 @@ public class DefaultPermissionAttachment implements PermissionAttachment {
     }
 
     /**
-     * Returns an iterator over elements of type {@code T}.
+     * Returns an iterator over elements of type {@link Permission}
      *
-     * @return an Iterator.
+     * @return an {@link Iterator} that will iterate through all permissions contained in this object.
      */
     @Override
-    @SuppressWarnings("unchecked")
     public Iterator<Permission> iterator() {
-        return new Iterator() {
+        return new Iterator<Permission>() {
             private int index = 0;
 
             @Override
@@ -91,7 +90,7 @@ public class DefaultPermissionAttachment implements PermissionAttachment {
             }
 
             @Override
-            public Object next() {
+            public Permission next() {
                 index++;
                 return permissions.get(index - 1);
             }
