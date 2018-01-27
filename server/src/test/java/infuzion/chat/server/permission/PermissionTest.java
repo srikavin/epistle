@@ -20,34 +20,34 @@ import me.infuzion.chat.server.api.permission.Permission;
 import me.infuzion.chat.server.api.permission.PermissionDefault;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class PermissionTest {
     @Test
     public void toStringTest() {
         DefaultPermission permission = new DefaultPermission("123");
-        assertTrue(permission.getName().equals("123"));
+        assertEquals("123", permission.getName());
 
         DefaultPermission permission1 = new DefaultPermission("213");
-        assertFalse(permission.getName().equals(permission1.getName()));
+        assertNotEquals(permission.getName(), permission1.getName());
     }
 
     @Test
     public void getType() {
         Permission permission = new DefaultPermission("");
-        assertTrue(permission.getType().equals(PermissionDefault.FALSE));
+        assertEquals(permission.getType(), PermissionDefault.FALSE);
         Permission permission1 = new DefaultPermission("", PermissionDefault.TRUE);
-        assertTrue(permission1.getType().equals(PermissionDefault.TRUE));
+        assertEquals(permission1.getType(), PermissionDefault.TRUE);
     }
 
     @Test
     public void equals() {
         DefaultPermission permission = new DefaultPermission("123");
         Object object = new Object();
-        assertFalse(permission.equals(object));
+        assertNotEquals(permission, object);
         DefaultPermission permission1 = new DefaultPermission("123");
-        assertTrue(permission.equals(permission1));
-        assertTrue(permission1.equals(permission));
+        assertEquals(permission, permission1);
+        assertEquals(permission1, permission);
     }
 }

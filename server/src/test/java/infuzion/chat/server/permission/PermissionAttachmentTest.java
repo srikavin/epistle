@@ -55,19 +55,19 @@ public class PermissionAttachmentTest {
         PermissionAttachment pA = new DefaultPermissionAttachment();
         pA.addPermission(new DefaultPermission("213"));
         Object obj = new Object();
-        assertFalse(pA.equals(obj));
+        assertNotEquals(pA, obj);
 
         PermissionAttachment pA1 = new DefaultPermissionAttachment();
         pA1.addPermission(new DefaultPermission("123"));
 
-        assertFalse(pA.equals(pA1));
-        assertFalse(pA1.equals(pA));
+        assertNotEquals(pA, pA1);
+        assertNotEquals(pA1, pA);
 
         pA.addPermission(new DefaultPermission("123"));
         pA1.addPermission(new DefaultPermission("213"));
 
-        assertTrue(pA.equals(pA1));
-        assertTrue(pA1.equals(pA));
+        assertEquals(pA, pA1);
+        assertEquals(pA1, pA);
     }
 
     @Test
