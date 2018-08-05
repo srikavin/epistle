@@ -16,16 +16,15 @@
 
 package infuzion.plugin.test;
 
-import infuzion.chat.server.Server;
-import infuzion.chat.server.command.DefaultCommand;
-import infuzion.chat.server.event.chat.MessageEvent;
-import infuzion.chat.server.event.command.PreCommandEvent;
-import infuzion.chat.server.event.connection.JoinEvent;
-import infuzion.chat.server.event.reflection.EventHandler;
-import infuzion.chat.server.permission.DefaultPermission;
 import me.infuzion.chat.server.api.IChatClient;
+import me.infuzion.chat.server.api.command.DefaultCommand;
 import me.infuzion.chat.server.api.command.ICommandExecutor;
 import me.infuzion.chat.server.api.event.IEventListener;
+import me.infuzion.chat.server.api.event.chat.MessageEvent;
+import me.infuzion.chat.server.api.event.command.PreCommandEvent;
+import me.infuzion.chat.server.api.event.connection.JoinEvent;
+import me.infuzion.chat.server.api.event.reflection.EventHandler;
+import me.infuzion.chat.server.api.permission.DefaultPermission;
 import me.infuzion.chat.server.api.permission.Permission;
 import me.infuzion.chat.server.api.permission.PermissionAttachment;
 import me.infuzion.chat.server.api.permission.PermissionDefault;
@@ -38,15 +37,13 @@ public class test extends BasePlugin implements ICommandExecutor, IEventListener
         System.setProperty("enabled", "1");
         System.out.println("For testing: onEnable()");
 
-        if (getServer() instanceof Server) { // Not necessary to run with FakeServer
-            getCommandManager().registerCommand(new DefaultCommand("test"), this);
-            getCommandManager().registerCommand(new DefaultCommand("permissions"), this);
-            getPermissionManager().registerPermission(new DefaultCommand("test"), new DefaultPermission("test.test",
-                    PermissionDefault.TRUE));
-            getPermissionManager().registerPermission(new DefaultCommand("permissions"),
-                    new DefaultPermission("test.permission", PermissionDefault.TRUE));
-            getEventManager().registerListener(this, this);
-        }
+        getCommandManager().registerCommand(new DefaultCommand("test"), this);
+        getCommandManager().registerCommand(new DefaultCommand("permissions"), this);
+        getPermissionManager().registerPermission(new DefaultCommand("test"), new DefaultPermission("test.test",
+                PermissionDefault.TRUE));
+        getPermissionManager().registerPermission(new DefaultCommand("permissions"),
+                new DefaultPermission("test.permission", PermissionDefault.TRUE));
+        getEventManager().registerListener(this, this);
     }
 
     @Override
@@ -60,7 +57,6 @@ public class test extends BasePlugin implements ICommandExecutor, IEventListener
         System.setProperty("disabled", "1");
         System.out.println("For testing: onDisable()");
     }
-
 
     @Override
     public void onCommand(String commandName, String[] args, IChatClient client) {

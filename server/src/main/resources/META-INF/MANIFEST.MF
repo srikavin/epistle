@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
 Class-Path: yamlbeans-1.08.jar commons-lang3-3.1.jar
-Main-Class: infuzion.chat.server.Main
+Main-Class: me.infuzion.chat.server.Main
 
