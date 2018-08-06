@@ -18,9 +18,10 @@ package me.infuzion.chat.server.command.vanilla;
 
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.IServer;
-import me.infuzion.chat.server.api.command.ICommandExecutor;
+import me.infuzion.chat.server.api.command.Command;
+import me.infuzion.chat.server.api.command.DefaultCommand;
 
-public class TpsCommand implements ICommandExecutor {
+public class TpsCommand implements VanillaCommandExecutor {
 
     private final static String tpsTemplate = "The server is running at %d ticks per second.";
     private final static String totalTpsTemplate = "The server has run for a total of %d ticks.";
@@ -28,6 +29,7 @@ public class TpsCommand implements ICommandExecutor {
 
     public TpsCommand(IServer server) {
         this.server = server;
+        server.getPermissionManager().registerPermission("tps", "server.tps");
     }
 
     @Override
@@ -47,5 +49,12 @@ public class TpsCommand implements ICommandExecutor {
     @Override
     public String[] getHelp() {
         return new String[]{"Usage: /tps"};
+    }
+
+    @Override
+    public Command[] getCommands() {
+        return new Command[]{
+                new DefaultCommand("tps")
+        };
     }
 }

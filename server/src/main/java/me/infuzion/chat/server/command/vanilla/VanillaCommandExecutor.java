@@ -14,27 +14,11 @@
  * limitations under the License.
  */
 
-package me.infuzion.chat.server.mock;
+package me.infuzion.chat.server.command.vanilla;
 
-import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.ICommandExecutor;
-import me.infuzion.chat.server.api.command.ICommandManager;
-import me.infuzion.chat.server.api.event.IEventManager;
 
-public class FakeCommandManager implements ICommandManager {
-    @Override
-    public void registerCommand(Command command, ICommandExecutor executor) {
-
-    }
-
-    @Override
-    public void registerCommands(ICommandExecutor executor, Command... commands) {
-
-    }
-
-    @Override
-    public void executeCommand(String command, String[] args, IChatClient client, IEventManager eventManager) {
-
-    }
+public interface VanillaCommandExecutor extends ICommandExecutor {
+    Command[] getCommands();
 }

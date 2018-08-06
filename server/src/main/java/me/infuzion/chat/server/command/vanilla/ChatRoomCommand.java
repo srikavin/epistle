@@ -19,9 +19,10 @@ package me.infuzion.chat.server.command.vanilla;
 import me.infuzion.chat.server.ChatRoom;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.IChatRoomManager;
-import me.infuzion.chat.server.api.command.ICommandExecutor;
+import me.infuzion.chat.server.api.command.Command;
+import me.infuzion.chat.server.api.command.DefaultCommand;
 
-public class ChatRoomCommand implements ICommandExecutor {
+public class ChatRoomCommand implements VanillaCommandExecutor {
 
     @Override
     public void onCommand(String commandName, String[] args, IChatClient client) {
@@ -64,5 +65,15 @@ public class ChatRoomCommand implements ICommandExecutor {
         for (String e : getHelp()) {
             client.sendMessage(e);
         }
+    }
+
+    @Override
+    public Command[] getCommands() {
+        return new Command[]{
+                new DefaultCommand("cr"),
+                new DefaultCommand("chatroom"),
+                new DefaultCommand("create"),
+                new DefaultCommand("move")
+        };
     }
 }

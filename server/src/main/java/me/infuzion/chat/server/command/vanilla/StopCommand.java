@@ -18,15 +18,16 @@ package me.infuzion.chat.server.command.vanilla;
 
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.IServer;
-import me.infuzion.chat.server.api.command.ICommandExecutor;
+import me.infuzion.chat.server.api.command.Command;
+import me.infuzion.chat.server.api.command.DefaultCommand;
 
-public class StopCommand implements ICommandExecutor {
+public class StopCommand implements VanillaCommandExecutor {
 
     private final IServer server;
 
     public StopCommand(IServer server) {
         this.server = server;
-        server.getPermissionManager().registerPermission("stop", "chat.stop");
+        server.getPermissionManager().registerPermission("stop", "server.stop");
     }
 
     @Override
@@ -39,5 +40,12 @@ public class StopCommand implements ICommandExecutor {
     @Override
     public String[] getHelp() {
         return new String[0];
+    }
+
+    @Override
+    public Command[] getCommands() {
+        return new Command[]{
+                new DefaultCommand("stop")
+        };
     }
 }

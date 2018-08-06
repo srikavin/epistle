@@ -26,22 +26,26 @@ import me.infuzion.chat.server.api.event.IEventManager;
 import me.infuzion.chat.server.api.event.command.PreCommandEvent;
 import me.infuzion.chat.server.command.vanilla.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class CommandManager implements ICommandManager {
-    private final List<ICommandExecutor> vanillaCommandExecutors = new ArrayList<>();
     private final Map<Command, ICommandExecutor> pluginCommandExecutors = new HashMap<>();
 
     public CommandManager(Server server) {
-        addCommandExecutor(new ChatRoomCommand());
-        addCommandExecutor(new ModeratorCommand(server));
-        addCommandExecutor(new ReloadCommand(server));
-        addCommandExecutor(new StopCommand(server));
-        addCommandExecutor(new TpsCommand(server));
-        addCommandExecutor(new ClientInfoCommand(server));
+        final VanillaCommandExecutor[] executors = {
+                new ChatRoomCommand(),
+                new ModeratorCommand(server),
+                new ReloadCommand(server),
+                new StopCommand(server),
+                new TpsCommand(server),
+                new ClientInfoCommand(server),
+                new SayCommand()
+        };
+
+        for (VanillaCommandExecutor e : executors) {
+            registerCommands(e, e.getCommands());
+        }
     }
 
     @Override
@@ -50,13 +54,13 @@ public class CommandManager implements ICommandManager {
     }
 
     @Override
-    public List<ICommandExecutor> getCommandExecutors() {
-        return vanillaCommandExecutors;
-    }
-
-    @Override
-    public void addCommandExecutor(ICommandExecutor executor) {
-        vanillaCommandExecutors.add(executor);
+    public void registerCommands(ICommandExecutor executor, Command... commands) {
+        if (commands.length == 0) {
+            throw new RuntimeException("Expected at least 1 command to be registered to this executor");
+        }
+        for (Command e : commands) {
+            pluginCommandExecutors.put(e, executor);
+        }
     }
 
     @Override
@@ -67,9 +71,7 @@ public class CommandManager implements ICommandManager {
             return;
         }
         System.out.println(client.getName() + " executed: " + command);
-        for (ICommandExecutor executor : vanillaCommandExecutors) {
-            executor.onCommand(command, args, client);
-        }
+
         boolean found = false;
         for (Map.Entry<Command, ICommandExecutor> e : pluginCommandExecutors.entrySet()) {
             if (e.getKey().equals(new DefaultCommand(command))) {

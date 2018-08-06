@@ -16,38 +16,33 @@
 
 package me.infuzion.chat.server.command.vanilla;
 
+import me.infuzion.chat.server.ChatRoom;
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.api.IServer;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
-import me.infuzion.chat.server.api.permission.IPermissionManager;
 
-public class ReloadCommand implements VanillaCommandExecutor {
-
-    private final IServer server;
-
-    public ReloadCommand(IServer server) {
-        this.server = server;
-        IPermissionManager permissionManager = server.getPermissionManager();
-        permissionManager.registerPermission("reload", "server.reload");
+public class SayCommand implements VanillaCommandExecutor {
+    @Override
+    public Command[] getCommands() {
+        return new Command[]{
+                new DefaultCommand("say")
+        };
     }
 
     @Override
     public void onCommand(String commandName, String[] args, IChatClient client) {
-        if (commandName.equals("reload")) {
-            server.reload();
+        if (commandName.equals("say")) {
+            StringBuilder message = new StringBuilder();
+            for (String arg : args) {
+                message.append(" ").append(arg);
+            }
+
+            ChatRoom.getChatRoomManager().sendMessageAll(message.toString(), client);
         }
     }
 
     @Override
     public String[] getHelp() {
         return new String[0];
-    }
-
-    @Override
-    public Command[] getCommands() {
-        return new Command[]{
-                new DefaultCommand("reload")
-        };
     }
 }

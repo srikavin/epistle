@@ -20,14 +20,15 @@ import me.infuzion.chat.server.ChatClient;
 import me.infuzion.chat.server.ChatRoom;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.IServer;
-import me.infuzion.chat.server.api.command.ICommandExecutor;
+import me.infuzion.chat.server.api.command.Command;
+import me.infuzion.chat.server.api.command.DefaultCommand;
 import me.infuzion.chat.server.api.event.IEventListener;
 import me.infuzion.chat.server.api.event.chat.ChatEvent;
 import me.infuzion.chat.server.api.event.reflection.EventHandler;
 import me.infuzion.chat.server.api.event.reflection.EventPriority;
 import me.infuzion.chat.server.api.permission.IPermissionManager;
 
-public class ModeratorCommand implements ICommandExecutor, IEventListener {
+public class ModeratorCommand implements VanillaCommandExecutor, IEventListener {
     public ModeratorCommand(IServer server) {
         IPermissionManager permissionManager = server.getPermissionManager();
         server.getEventManager().registerListener(this, null);
@@ -90,5 +91,14 @@ public class ModeratorCommand implements ICommandExecutor, IEventListener {
     @SuppressWarnings("SameReturnValue")
     public String getPrefix() {
         return "Moderator";
+    }
+
+    @Override
+    public Command[] getCommands() {
+        return new Command[]{
+                new DefaultCommand("kick"),
+                new DefaultCommand("ban"),
+                new DefaultCommand("mute")
+        };
     }
 }
