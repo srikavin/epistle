@@ -19,14 +19,10 @@ package me.infuzion.chat.server.api.command;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.event.IEventManager;
 
-import java.util.List;
-
 public interface ICommandManager {
     void registerCommand(Command command, ICommandExecutor executor);
 
-    List<ICommandExecutor> getCommandExecutors();
-
-    void addCommandExecutor(ICommandExecutor executor);
+    void registerCommands(ICommandExecutor executor, Command... commands);
 
     void executeCommand(String command, String[] args, IChatClient client, IEventManager eventManager);
 }

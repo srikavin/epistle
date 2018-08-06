@@ -33,12 +33,6 @@
         <module>server-api</module>
     </modules>
 
-    <build>
-        <plugins>
-
-        </plugins>
-    </build>
-
     <properties>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
