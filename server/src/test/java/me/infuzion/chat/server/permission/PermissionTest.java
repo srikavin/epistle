@@ -19,10 +19,10 @@ package me.infuzion.chat.server.permission;
 import me.infuzion.chat.server.api.permission.DefaultPermission;
 import me.infuzion.chat.server.api.permission.Permission;
 import me.infuzion.chat.server.api.permission.PermissionDefault;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 public class PermissionTest {
     @Test

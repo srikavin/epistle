@@ -26,8 +26,8 @@ import me.infuzion.chat.server.mock.FakeClient;
 import me.infuzion.chat.server.mock.FakeServer;
 import me.infuzion.chat.server.mock.FakeServerClient;
 import me.infuzion.chat.server.permission.DefaultPermissionAttachment;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -36,7 +36,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class DefaultPermissionManagerTest {
     @Test
@@ -87,11 +87,10 @@ public class DefaultPermissionManagerTest {
         map1.put("group", groups);
         map.put("testGroup", map1);
         DefaultPermissionManager dPM = new DefaultPermissionManager(new FakeServer(), map);
-        assertTrue("Should have this permission", dPM.hasPermission("should.have", fakeClient));
-        assertTrue("Should have this permission from group",
-                dPM.hasPermission("should.have.from.group", fakeClient));
-        assertFalse("Should not have this permission", dPM.hasPermission("should.not.have",
-                fakeClient));
+        assertTrue(dPM.hasPermission("should.have", fakeClient), "Should have this permission");
+        assertTrue(dPM.hasPermission("should.have.from.group", fakeClient),
+                "Should have this permission from group");
+        assertFalse(dPM.hasPermission("should.not.have", fakeClient), "Should not have this permission");
     }
 
     @Test
@@ -135,17 +134,17 @@ public class DefaultPermissionManagerTest {
 
         DefaultPermissionManager dPM = new DefaultPermissionManager(new FakeServer(), map);
 
-        assertTrue("Should have this permission", dPM.hasPermission("directly.attached",
-                fakeClient));
+        assertTrue(dPM.hasPermission("directly.attached",
+                fakeClient), "Should have this permission");
 
-        assertTrue("Should have this permission from groupA",
-                dPM.hasPermission("from.group.A", fakeClient));
+        assertTrue(dPM.hasPermission("from.group.A", fakeClient),
+                "Should have this permission from groupA");
 
-        assertTrue("Should have this permission from groupB",
-                dPM.hasPermission("from.group.B", fakeClient));
+        assertTrue(dPM.hasPermission("from.group.B", fakeClient),
+                "Should have this permission from groupB");
 
-        assertFalse("Should not have this permission", dPM.hasPermission("should.not.have",
-                fakeClient));
+        assertFalse(dPM.hasPermission("should.not.have",
+                fakeClient), "Should not have this permission");
     }
 
     @Test
@@ -159,10 +158,10 @@ public class DefaultPermissionManagerTest {
         PreCommandEvent shouldBeCanceled = new PreCommandEvent("test", new String[]{}, fakeClient);
         defaultPermissionManager.onCommand(shouldBeCanceled);
 
-        assertTrue("Event should be canceled", shouldBeCanceled.isCanceled());
+        assertTrue(shouldBeCanceled.isCanceled(), "Event should be canceled");
     }
 
-    @Before
+    @BeforeEach
     public void resetStatic() throws Exception {
         Field field = IPermissionGroup.class.getDeclaredField("groups");
         field.setAccessible(true);
@@ -180,7 +179,7 @@ public class DefaultPermissionManagerTest {
         IChatClient fakeClient = new FakeClient();
 
         PermissionAttachment shouldBeEmpty = defaultPermissionManager.getPermissionAttachment(fakeClient);
-        assertEquals("Should be empty", 0, shouldBeEmpty.getPermissions().size());
+        assertEquals(0, shouldBeEmpty.getPermissions().size(), "Should be empty");
     }
 
 }

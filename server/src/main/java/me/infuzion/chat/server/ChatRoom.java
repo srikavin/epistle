@@ -31,7 +31,7 @@ public class ChatRoom implements IChatRoom {
     private final UUID uuid;
     private final List<IChatClient> clients = new LinkedList<>();
 
-    public ChatRoom(String name){
+    public ChatRoom(String name) {
         this.name = name;
         this.uuid = UUID.randomUUID();
     }
@@ -61,15 +61,11 @@ public class ChatRoom implements IChatRoom {
     }
 
     public void sendMessage(String message, IChatClient chatClient) {
-        for (IChatClient client : clients) {
-            client.sendMessage(chatClient.getPrefix() + message);
-        }
+        clients.forEach(client -> client.sendMessage(chatClient.getPrefix() + message));
     }
 
-    public void sendData(String data, DataType dataType){
-        for (IChatClient client : clients) {
-            client.sendData(data, dataType);
-        }
+    public void sendData(String data, DataType dataType) {
+        clients.forEach(client -> client.sendData(data, dataType));
     }
 
     public boolean equals(Object obj) {

@@ -20,21 +20,21 @@ import infuzion.chat.common.network.packet.NetworkPacket;
 import infuzion.chat.common.network.packet.PacketParser;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.network.PacketRouter;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class PacketRouterTest {
     @Mock
     private NetworkPacket packet;
@@ -45,7 +45,7 @@ public class PacketRouterTest {
 
     private PacketRouter router;
 
-    @Before
+    @BeforeEach
     public void createInstance() {
         List<PacketParser> handlers = new ArrayList<>();
 

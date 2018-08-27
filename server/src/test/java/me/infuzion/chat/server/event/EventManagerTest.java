@@ -23,9 +23,9 @@ import me.infuzion.chat.server.api.event.reflection.EventHandler;
 import me.infuzion.chat.server.api.event.reflection.EventPriority;
 import me.infuzion.chat.server.api.event.reflection.Listener;
 import me.infuzion.chat.server.mock.FakeServer;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class EventManagerTest implements IEventListener {
     private boolean[] orderCalled = {false, false, false, false, false};

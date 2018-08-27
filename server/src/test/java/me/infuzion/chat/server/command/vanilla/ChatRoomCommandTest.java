@@ -18,9 +18,9 @@ package me.infuzion.chat.server.command.vanilla;
 
 import me.infuzion.chat.server.ChatRoomManager;
 import me.infuzion.chat.server.mock.FakeClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ChatRoomCommandTest {
 

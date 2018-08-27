@@ -20,7 +20,7 @@ import me.infuzion.chat.server.api.event.Event;
 import me.infuzion.chat.server.api.event.IEventListener;
 import me.infuzion.chat.server.api.event.reflection.EventHandler;
 
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.fail;
 
 public class InvalidListener implements IEventListener {
     @EventHandler

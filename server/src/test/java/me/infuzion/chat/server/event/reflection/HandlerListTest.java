@@ -17,17 +17,17 @@
 package me.infuzion.chat.server.event.reflection;
 
 import me.infuzion.chat.server.api.event.reflection.HandlerList;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class HandlerListTest {
-    @Before
+    @BeforeEach
     public void resetStatic() throws Exception {
         Field field = HandlerList.class.getDeclaredField("allListeners");
         field.setAccessible(true);
@@ -41,13 +41,13 @@ public class HandlerListTest {
     @Test
     public void getHandlersAndRegister() {
         HandlerList handlerList = new HandlerList();
-        assertEquals("Should be empty", 0, handlerList.getHandlers().size());
+        assertEquals(0, handlerList.getHandlers().size());
         handlerList.register(new DefaultListener(null, null, null, null, null));
-        assertEquals("Should be one", 1, handlerList.getHandlers().size());
-        handlerList.register(new DefaultListener(null, null, null, null, null));
-        handlerList.register(new DefaultListener(null, null, null, null, null));
+        assertEquals(1, handlerList.getHandlers().size());
         handlerList.register(new DefaultListener(null, null, null, null, null));
         handlerList.register(new DefaultListener(null, null, null, null, null));
-        assertEquals("Should be five", 5, handlerList.getHandlers().size());
+        handlerList.register(new DefaultListener(null, null, null, null, null));
+        handlerList.register(new DefaultListener(null, null, null, null, null));
+        assertEquals(5, handlerList.getHandlers().size());
     }
 }

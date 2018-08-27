@@ -17,12 +17,12 @@
 package me.infuzion.chat.server.plugin.loader;
 
 import me.infuzion.chat.server.mock.FakeServer;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PluginManagerTest {
     @Test
@@ -55,7 +55,7 @@ public class PluginManagerTest {
         return pl;
     }
 
-    @Before
+    @BeforeEach
     public void reset() {
         System.setProperty("enabled", "0");
         System.setProperty("loaded", "0");
