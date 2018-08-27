@@ -16,7 +16,7 @@
 
 package me.infuzion.chat.server.command;
 
-import me.infuzion.chat.server.Server;
+import me.infuzion.chat.server.ChatServer;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
@@ -32,7 +32,7 @@ import java.util.Map;
 public class CommandManager implements ICommandManager {
     private final Map<Command, ICommandExecutor> pluginCommandExecutors = new HashMap<>();
 
-    public CommandManager(Server server) {
+    public CommandManager(ChatServer server) {
         final VanillaCommandExecutor[] executors = {
                 new ChatRoomCommand(),
                 new ModeratorCommand(server),

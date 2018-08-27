@@ -19,20 +19,26 @@ package me.infuzion.chat.server;
 import infuzion.chat.common.DataType;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.IChatRoom;
+import me.infuzion.chat.server.api.network.ClientConnection;
 import me.infuzion.chat.server.api.permission.PermissionAttachment;
 import me.infuzion.chat.server.permission.DefaultPermissionAttachment;
 
-import java.net.Socket;
 import java.util.UUID;
 
 public class ServerChatClient implements IChatClient {
+
     private final UUID uuid = new UUID(0, 0);
     private final String name = "Server";
+    ServerClientConnection serverClientConnection;
     private String prefix = "[" + name + "]";
+
+    public ServerChatClient() {
+        serverClientConnection = new ServerClientConnection();
+    }
 
     @Override
     public void kick(String message) {
-        System.out.print("Somebody attempted to kick you for " + message);
+        serverClientConnection.sendMessage(DataType.Message, "Somebody attempted to kick you for " + message);
     }
 
     @Override
@@ -92,7 +98,7 @@ public class ServerChatClient implements IChatClient {
     }
 
     @Override
-    public Socket getSocket() {
-        return null;
+    public ClientConnection getConnection() {
+        return serverClientConnection;
     }
 }

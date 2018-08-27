@@ -17,45 +17,34 @@
 package me.infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
+import infuzion.chat.common.network.packet.MessagePacket;
+import infuzion.chat.common.network.packet.NetworkPacket;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.IChatRoom;
+import me.infuzion.chat.server.api.network.ClientConnection;
 import me.infuzion.chat.server.api.permission.PermissionAttachment;
+import me.infuzion.chat.server.network.SocketConnection;
 
-import java.io.DataOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-@SuppressWarnings("WeakerAccess")
 public class ChatClient implements IChatClient {
-    private final static Map<Socket, IChatClient> clientSocketMap = new HashMap<>();
     private final static Map<String, IChatClient> clientStringMap = new HashMap<>();
     private final String name;
     private final UUID uuid;
-    private final Socket socket;
+    private final ClientConnection connection;
     private PermissionAttachment permissionAttachment;
     private String prefix;
-    private DataOutputStream outputStream;
     private IChatRoom currentIChatRoom;
 
-    public ChatClient(String name, UUID uuid, Socket socket) {
+    public ChatClient(String name, UUID uuid, ClientConnection connection) {
         this.name = name;
         this.uuid = uuid;
-        try {
-            this.outputStream = new DataOutputStream(socket.getOutputStream());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        this.socket = socket;
-        clientSocketMap.put(socket, this);
+        this.connection = connection;
         clientStringMap.put(name, this);
         prefix = "[" + name + "] ";
-    }
-
-    public static IChatClient fromSocket(Socket sock) {
-        return clientSocketMap.get(sock);
     }
 
     public static IChatClient fromName(String name) {
@@ -64,11 +53,9 @@ public class ChatClient implements IChatClient {
 
     public void kick(String message) {
         sendData(message, DataType.Kick);
-        clientSocketMap.remove(socket);
         clientStringMap.remove(name);
         try {
-            socket.shutdownInput();
-            socket.shutdownOutput();
+            connection.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -83,7 +70,7 @@ public class ChatClient implements IChatClient {
     }
 
     public void sendMessage(String message) {
-        sendData(message, DataType.Message);
+        sendPacket(new MessagePacket(message));
     }
 
     public IChatRoom getChatRoom() {
@@ -94,13 +81,21 @@ public class ChatClient implements IChatClient {
         this.currentIChatRoom = IChatRoom;
     }
 
-    @SuppressWarnings("Duplicates")
+    @Deprecated
     public void sendData(String data, DataType id) {
         try {
-            outputStream.writeByte(id.byteValue);
-            outputStream.writeUTF(data);
-            outputStream.writeByte(DataType.EndOfData.byteValue);
+            connection.sendMessage(id, data);
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendPacket(NetworkPacket packet) {
+        try {
+            System.out.println(((SocketConnection) connection).getSocket().getInetAddress().toString());
+            connection.sendPacket(packet);
+        } catch (IOException e) {
+            ChatRoom.getChatRoomManager().removeClient(this);
             e.printStackTrace();
         }
     }
@@ -128,8 +123,8 @@ public class ChatClient implements IChatClient {
     }
 
     @Override
-    public Socket getSocket() {
-        return socket;
+    public ClientConnection getConnection() {
+        return connection;
     }
 
     @Override

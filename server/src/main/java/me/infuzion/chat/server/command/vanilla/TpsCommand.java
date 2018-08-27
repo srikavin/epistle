@@ -17,7 +17,7 @@
 package me.infuzion.chat.server.command.vanilla;
 
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
 
@@ -25,9 +25,9 @@ public class TpsCommand implements VanillaCommandExecutor {
 
     private final static String tpsTemplate = "The server is running at %d ticks per second.";
     private final static String totalTpsTemplate = "The server has run for a total of %d ticks.";
-    private final IServer server;
+    private final Server server;
 
-    public TpsCommand(IServer server) {
+    public TpsCommand(Server server) {
         this.server = server;
         server.getPermissionManager().registerPermission("tps", "server.tps");
     }

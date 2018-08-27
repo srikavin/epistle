@@ -16,7 +16,7 @@
 
 package me.infuzion.chat.server.plugin.loader;
 
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.plugin.BasePlugin;
 import me.infuzion.chat.server.api.plugin.Plugin;
 import me.infuzion.chat.server.api.plugin.loader.IPluginManager;
@@ -30,9 +30,9 @@ import java.util.jar.JarFile;
 
 public class PluginManager implements IPluginManager {
     private final List<Plugin> plugins = new ArrayList<>();
-    private final IServer server;
+    private final Server server;
 
-    public PluginManager(IServer server) {
+    public PluginManager(Server server) {
         this.server = server;
     }
 

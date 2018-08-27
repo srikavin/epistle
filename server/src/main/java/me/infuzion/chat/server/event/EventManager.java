@@ -16,7 +16,7 @@
 
 package me.infuzion.chat.server.event;
 
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.event.BaseEvent;
 import me.infuzion.chat.server.api.event.Event;
 import me.infuzion.chat.server.api.event.IEventListener;
@@ -39,7 +39,7 @@ import java.util.List;
 public class EventManager implements IEventManager {
     private List<Class<? extends Event>> eventTypes = new ArrayList<>();
 
-    public EventManager(IServer server) {
+    public EventManager(Server server) {
         registerDefaultEvents();
     }
 

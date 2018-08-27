@@ -17,15 +17,15 @@
 package me.infuzion.chat.server.command.vanilla;
 
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
 
 public class StopCommand implements VanillaCommandExecutor {
 
-    private final IServer server;
+    private final Server server;
 
-    public StopCommand(IServer server) {
+    public StopCommand(Server server) {
         this.server = server;
         server.getPermissionManager().registerPermission("stop", "server.stop");
     }

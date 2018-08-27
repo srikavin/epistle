@@ -19,7 +19,7 @@ package me.infuzion.chat.server.command.vanilla;
 import me.infuzion.chat.server.ChatClient;
 import me.infuzion.chat.server.ChatRoom;
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
 import me.infuzion.chat.server.api.event.IEventListener;
@@ -29,7 +29,7 @@ import me.infuzion.chat.server.api.event.reflection.EventPriority;
 import me.infuzion.chat.server.api.permission.IPermissionManager;
 
 public class ModeratorCommand implements VanillaCommandExecutor, IEventListener {
-    public ModeratorCommand(IServer server) {
+    public ModeratorCommand(Server server) {
         IPermissionManager permissionManager = server.getPermissionManager();
         server.getEventManager().registerListener(this, null);
         permissionManager.registerPermission("kick", "chat.kick");

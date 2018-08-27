@@ -16,7 +16,7 @@
 
 package me.infuzion.chat.server.api.plugin;
 
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.ICommandManager;
 import me.infuzion.chat.server.api.event.IEventManager;
 import me.infuzion.chat.server.api.permission.IPermissionManager;
@@ -27,13 +27,13 @@ public abstract class BasePlugin implements Plugin {
     private DescriptionFile descriptionFile;
     private ICommandManager commandManager;
     private IEventManager eventManager;
-    private IServer server;
+    private Server server;
     private IPermissionManager permissionManager;
 
     public BasePlugin() {
     }
 
-    public final void init(DescriptionFile descriptionFile, IServer server) {
+    public final void init(DescriptionFile descriptionFile, Server server) {
         this.descriptionFile = descriptionFile;
         this.commandManager = server.getCommandManager();
         this.eventManager = server.getEventManager();
@@ -75,7 +75,7 @@ public abstract class BasePlugin implements Plugin {
     }
 
     @Override
-    public IServer getServer() {
+    public Server getServer() {
         return server;
     }
 

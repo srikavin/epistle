@@ -19,7 +19,7 @@ package me.infuzion.chat.server.permission.def;
 import com.esotericsoftware.yamlbeans.YamlException;
 import com.esotericsoftware.yamlbeans.YamlReader;
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
 import me.infuzion.chat.server.api.event.IEventListener;
@@ -40,7 +40,7 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     private final List<IPermissionGroup> permissionGroups = new ArrayList<>();
     private final Map<Command, Permission> commandPermissionMap = new HashMap<>();
 
-    public DefaultPermissionManager(IServer server, Map<String, Map<String, List<String>>> map) {
+    public DefaultPermissionManager(Server server, Map<String, Map<String, List<String>>> map) {
         //Group or UUID "Permission" or "groups" Permissions/Groups
         if (map == null) {
             return;
@@ -87,7 +87,7 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
 
     }
 
-    public DefaultPermissionManager(IServer server, InputStreamReader permissionFileReader) throws YamlException {
+    public DefaultPermissionManager(Server server, InputStreamReader permissionFileReader) throws YamlException {
         //noinspection unchecked
         this(server, (Map<String, Map<String, List<String>>>) new YamlReader(permissionFileReader).read());
     }

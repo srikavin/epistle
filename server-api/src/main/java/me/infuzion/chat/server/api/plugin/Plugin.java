@@ -16,7 +16,7 @@
 
 package me.infuzion.chat.server.api.plugin;
 
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.event.IEventManager;
 import me.infuzion.chat.server.api.permission.IPermissionManager;
 import me.infuzion.chat.server.api.plugin.loader.DescriptionFile;
@@ -36,7 +36,7 @@ public interface Plugin {
 
     DescriptionFile getDescriptionFile();
 
-    IServer getServer();
+    Server getServer();
 
     IPermissionManager getPermissionManager();
 }

@@ -17,7 +17,7 @@
 package me.infuzion.chat.server.permission.def;
 
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.event.command.PreCommandEvent;
 import me.infuzion.chat.server.api.permission.DefaultPermission;
 import me.infuzion.chat.server.api.permission.IPermissionGroup;
@@ -41,7 +41,7 @@ import static org.junit.Assert.*;
 public class DefaultPermissionManagerTest {
     @Test
     public void hasPermission() {
-        IServer server = new FakeServer();
+        Server server = new FakeServer();
 
         Map<String, Map<String, List<String>>> map = new HashMap<>();
 
@@ -150,7 +150,7 @@ public class DefaultPermissionManagerTest {
 
     @Test
     public void registerPermission() {
-        IServer server = new FakeServer();
+        Server server = new FakeServer();
         DefaultPermissionManager defaultPermissionManager = new DefaultPermissionManager(server, new HashMap<>());
         IChatClient fakeClient = new FakeClient();
 
@@ -175,7 +175,7 @@ public class DefaultPermissionManagerTest {
 
     @Test
     public void getPermissionAttachment() {
-        IServer server = new FakeServer();
+        Server server = new FakeServer();
         DefaultPermissionManager defaultPermissionManager = new DefaultPermissionManager(server, new HashMap<>());
         IChatClient fakeClient = new FakeClient();
 

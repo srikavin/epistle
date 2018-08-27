@@ -1,19 +1,17 @@
 /*
+ * Copyright 2018 Srikavin Ramkumar
  *
- *  *  Copyright 2016 Infuzion
- *  *
- *  *    Licensed under the Apache License, Version 2.0 (the "License");
- *  *    you may not use this file except in compliance with the License.
- *  *    You may obtain a copy of the License at
- *  *
- *  *        http://www.apache.org/licenses/LICENSE-2.0
- *  *
- *  *    Unless required by applicable law or agreed to in writing, software
- *  *    distributed under the License is distributed on an "AS IS" BASIS,
- *  *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  *    See the License for the specific language governing permissions and
- *  *    limitations under the License.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package infuzion.chat.client;
@@ -21,6 +19,9 @@ package infuzion.chat.client;
 import infuzion.chat.client.controller.DisconnectDialogController;
 import infuzion.chat.client.controller.MainChatController;
 import infuzion.chat.common.DataType;
+import infuzion.chat.common.network.packet.ClientHelloPacket;
+import infuzion.chat.common.network.packet.MessagePacket;
+import infuzion.chat.common.network.packet.NetworkPacket;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -31,8 +32,8 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 public class Client implements Runnable {
     private DataInputStream input;
@@ -41,28 +42,20 @@ public class Client implements Runnable {
     private volatile boolean disconnected = false;
     private volatile boolean disconnectHandled = false;
     private Timer heartbeat;
+    private Socket sock;
 
     Client(String ip, int port, String username) throws IOException {
-        Socket sock = new Socket(ip, port);
+        sock = new Socket(ip, port);
         input = new DataInputStream(sock.getInputStream());
         output = new DataOutputStream(sock.getOutputStream());
-        output.writeByte(DataType.ClientHello.byteValue);
-        output.writeUTF(username);
-        output.writeByte(DataType.EndOfData.byteValue);
+
+        sendPacket(new ClientHelloPacket(username, UUID.nameUUIDFromBytes(username.getBytes(StandardCharsets.UTF_8))));
 
         heartbeat = new Timer();
         heartbeat.schedule(new TimerTask() {
             @Override
             public void run() {
-                try {
-                    output.writeByte(DataType.Heartbeat.byteValue);
-                    output.writeUTF("heart");
-                    output.writeByte(DataType.EndOfData.byteValue);
-                } catch (IOException e) {
-                    this.cancel();
-                    e.printStackTrace();
-                    disconnection(e);
-                }
+                sendData("heartbeat", DataType.Heartbeat);
             }
         }, 10, 5000);
     }
@@ -103,14 +96,31 @@ public class Client implements Runnable {
         } else {
             sendData(message, DataType.Message);
         }
-
     }
 
-    @SuppressWarnings("Duplicates")
+    public void sendPacket(NetworkPacket packet) {
+        try {
+            byte[] bytes = packet.asBytes();
+
+            System.out.println(bytes.length);
+            output.writeShort(packet.getSignature());
+            output.writeInt(bytes.length);
+            output.write(bytes);
+            output.writeByte(DataType.EndOfData.byteValue);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendData(String data, DataType type) {
         try {
-            output.writeByte(type.byteValue);
-            output.writeUTF(data);
+            output.writeShort(type.byteValue);
+            byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
+            output.writeInt(bytes.length + 4);
+
+            output.writeInt(bytes.length);
+            output.write(bytes);
+
             output.writeByte(DataType.EndOfData.byteValue);
         } catch (IOException e) {
             e.printStackTrace();
@@ -122,29 +132,36 @@ public class Client implements Runnable {
     public void run() {
         try {
             while (true) {
-                long curTime = System.currentTimeMillis();
                 if (input.available() <= 0) {
+                    Thread.sleep(100);
                     continue;
                 }
-                byte messageType = input.readByte();
-                String message = input.readUTF();
+
+                short messageType = input.readShort();
+                int length = input.readInt();
+
+                byte[] messageBytes = new byte[length];
+
+                System.out.println(input.read(messageBytes));
+
                 byte end = input.readByte();
+
                 if (end != DataType.EndOfData.byteValue) {
                     continue;
                 }
+
                 DataType mType = DataType.valueOf(messageType);
                 if (mType == null) {
                     continue;
                 }
 
                 if (mType.equals(DataType.Message)) {
-                    System.out.println(message);
-                    MainChatController.displayMessage(message + "\n");
+                    MessagePacket messagePacket = new MessagePacket(messageBytes);
+                    System.out.println(messagePacket.getMessage());
+                    MainChatController.displayMessage(messagePacket.getMessage() + '\n');
                 }
-                while (curTime + 100 > System.currentTimeMillis()) {
-                    long toSleep = (curTime + 100) - System.currentTimeMillis();
-                    TimeUnit.MILLISECONDS.sleep(toSleep);
-                }
+
+                Thread.sleep(100);
             }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

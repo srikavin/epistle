@@ -17,17 +17,18 @@
 package me.infuzion.chat.server.command.vanilla;
 
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
+import me.infuzion.chat.server.network.SocketConnection;
 
 import java.util.UUID;
 
 public class ClientInfoCommand implements VanillaCommandExecutor {
 
-    private final IServer server;
+    private final Server server;
 
-    public ClientInfoCommand(IServer server) {
+    public ClientInfoCommand(Server server) {
         this.server = server;
         server.getPermissionManager().registerPermission("clientinfo", "chat.info");
     }
@@ -39,14 +40,16 @@ public class ClientInfoCommand implements VanillaCommandExecutor {
                 String clientToCheck = args[0];
                 UUID uuid = null;
                 String chatroom = null;
-                String ip = null;
+                String ip = "unknown";
                 String name = null;
                 for (IChatClient e : server.getConnectedClients()) {
                     if (e.getName().equalsIgnoreCase(clientToCheck)) {
                         uuid = e.getUuid();
                         name = e.getName();
                         chatroom = e.getChatRoom().getName();
-                        ip = e.getSocket().getInetAddress().toString();
+                        if (e.getConnection() instanceof SocketConnection) {
+                            ip = ((SocketConnection) e.getConnection()).getSocket().getInetAddress().toString();
+                        }
                     }
                 }
                 if (uuid != null) {

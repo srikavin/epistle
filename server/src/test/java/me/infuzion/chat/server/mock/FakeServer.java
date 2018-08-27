@@ -17,7 +17,8 @@
 package me.infuzion.chat.server.mock;
 
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.api.IServer;
+import me.infuzion.chat.server.api.IChatRoomManager;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.ICommandManager;
 import me.infuzion.chat.server.api.event.IEventManager;
 import me.infuzion.chat.server.api.permission.IPermissionManager;
@@ -25,7 +26,7 @@ import me.infuzion.chat.server.api.plugin.loader.IPluginManager;
 
 import java.util.List;
 
-public class FakeServer implements IServer {
+public class FakeServer implements Server {
     public boolean stopCalled = false;
     private int tps = -1;
     private long totalTPS = -1;
@@ -71,6 +72,11 @@ public class FakeServer implements IServer {
     @Override
     public void setPermissionManager(IPermissionManager permissionManager) {
 
+    }
+
+    @Override
+    public IChatRoomManager getChatRoomManager() {
+        return null;
     }
 
     @Override

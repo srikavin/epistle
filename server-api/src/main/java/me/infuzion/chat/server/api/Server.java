@@ -39,7 +39,7 @@ import me.infuzion.chat.server.api.plugin.loader.IPluginManager;
 
 import java.util.List;
 
-public interface IServer {
+public interface Server {
     void reload();
 
     void stop();
@@ -53,6 +53,8 @@ public interface IServer {
     IPermissionManager getPermissionManager();
 
     void setPermissionManager(IPermissionManager permissionManager);
+
+    IChatRoomManager getChatRoomManager();
 
     int getTps();
 

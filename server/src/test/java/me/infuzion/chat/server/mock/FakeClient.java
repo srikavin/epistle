@@ -19,12 +19,14 @@ package me.infuzion.chat.server.mock;
 import infuzion.chat.common.DataType;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.IChatRoom;
+import me.infuzion.chat.server.api.network.ClientConnection;
 import me.infuzion.chat.server.api.permission.PermissionAttachment;
 
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import static org.mockito.Mockito.mock;
 
 public class FakeClient implements IChatClient {
     public boolean sendMessageCalled = false;
@@ -44,7 +46,7 @@ public class FakeClient implements IChatClient {
 
     @Override
     public String getName() {
-        return null;
+        return "";
     }
 
     @Override
@@ -99,7 +101,7 @@ public class FakeClient implements IChatClient {
     }
 
     @Override
-    public Socket getSocket() {
-        return new Socket();
+    public ClientConnection getConnection() {
+        return mock(ClientConnection.class);
     }
 }
