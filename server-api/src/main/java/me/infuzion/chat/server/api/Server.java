@@ -32,8 +32,10 @@ package me.infuzion.chat.server.api;/*
  *
  */
 
+import infuzion.chat.common.network.packet.NetworkPacket;
 import me.infuzion.chat.server.api.command.ICommandManager;
 import me.infuzion.chat.server.api.event.IEventManager;
+import me.infuzion.chat.server.api.network.NetworkSource;
 import me.infuzion.chat.server.api.permission.IPermissionManager;
 import me.infuzion.chat.server.api.plugin.loader.IPluginManager;
 
@@ -53,6 +55,8 @@ public interface Server {
     IPermissionManager getPermissionManager();
 
     void setPermissionManager(IPermissionManager permissionManager);
+
+    void enqueue(NetworkPacket packet, IChatClient client, Class<? extends NetworkSource> source);
 
     IChatRoomManager getChatRoomManager();
 

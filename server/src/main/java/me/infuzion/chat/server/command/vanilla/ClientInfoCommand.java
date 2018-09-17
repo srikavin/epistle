@@ -20,7 +20,7 @@ import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
-import me.infuzion.chat.server.network.SocketConnection;
+import me.infuzion.chat.server.network.socket.SocketConnection;
 
 import java.util.UUID;
 

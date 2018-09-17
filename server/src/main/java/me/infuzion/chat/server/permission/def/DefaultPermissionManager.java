@@ -59,7 +59,8 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
             PermissionAttachment attachment = new DefaultPermissionAttachment();
 
             if (value.containsKey("permissions")) {
-                List<Permission> permissions = value.get("permissions").stream().map(DefaultPermission::new).collect(Collectors.toList());
+                List<Permission> permissions =
+                        value.get("permissions").stream().map(DefaultPermission::new).collect(Collectors.toList());
                 attachment = new DefaultPermissionAttachment(permissions);
             }
             if (value.containsKey("default")) {
@@ -74,7 +75,8 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
                 for (String groupName : value.get("group")) {
                     IPermissionGroup permissionGroup = IPermissionGroup.fromName(groupName);
                     if (permissionGroup == null) {
-                        permissionGroup = new DefaultPermissionGroup(groupName, new DefaultPermissionAttachment(), false);
+                        permissionGroup =
+                                new DefaultPermissionGroup(groupName, new DefaultPermissionAttachment(), false);
                     }
                     group.addGroup(permissionGroup);
                 }
@@ -90,6 +92,15 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     public DefaultPermissionManager(Server server, InputStreamReader permissionFileReader) throws YamlException {
         //noinspection unchecked
         this(server, (Map<String, Map<String, List<String>>>) new YamlReader(permissionFileReader).read());
+    }
+
+    public boolean hasPermission(Command command, IChatClient chatClient) {
+        Permission permission = commandPermissionMap.get(command);
+        if (permission == null) {
+            return false;
+        }
+
+        return this.hasPermission(permission, chatClient);
     }
 
     public boolean hasPermission(Permission permission, IChatClient chatClient) {
@@ -160,7 +171,9 @@ public class DefaultPermissionManager implements IPermissionManager, IEventListe
     public PermissionAttachment getPermissionAttachment(IChatClient chatClient) {
         IPermissionGroup group = IPermissionGroup.fromName(chatClient.getUuid().toString());
         if (group != null) {
-            return group.getCalculatedPermissions();
+            PermissionAttachment calculatedPermissions = group.getCalculatedPermissions();
+            chatClient.setPermissionAttachment(calculatedPermissions);
+            return calculatedPermissions;
         }
         return getDefault();
     }

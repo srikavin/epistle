@@ -19,14 +19,14 @@ package me.infuzion.chat.server.network.handler;
 import me.infuzion.chat.server.api.IChatRoomManager;
 import me.infuzion.chat.server.api.command.ICommandManager;
 import me.infuzion.chat.server.api.event.IEventManager;
-import me.infuzion.chat.server.network.PacketRouter;
+import me.infuzion.chat.server.network.DefaultPacketRouter;
 
 public class DefaultPacketHandler {
     private final IEventManager eventManager;
     private final IChatRoomManager chatRoomManager;
     private final ICommandManager commandManager;
 
-    public DefaultPacketHandler(IEventManager eventManager, IChatRoomManager chatRoomManager, ICommandManager commandManager, PacketRouter router) {
+    public DefaultPacketHandler(IEventManager eventManager, IChatRoomManager chatRoomManager, ICommandManager commandManager, DefaultPacketRouter router) {
         this.eventManager = eventManager;
         this.chatRoomManager = chatRoomManager;
         this.commandManager = commandManager;

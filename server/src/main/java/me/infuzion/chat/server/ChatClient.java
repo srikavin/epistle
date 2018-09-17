@@ -23,7 +23,6 @@ import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.IChatRoom;
 import me.infuzion.chat.server.api.network.ClientConnection;
 import me.infuzion.chat.server.api.permission.PermissionAttachment;
-import me.infuzion.chat.server.network.SocketConnection;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -92,7 +91,6 @@ public class ChatClient implements IChatClient {
 
     public void sendPacket(NetworkPacket packet) {
         try {
-            System.out.println(((SocketConnection) connection).getSocket().getInetAddress().toString());
             connection.sendPacket(packet);
         } catch (IOException e) {
             ChatRoom.getChatRoomManager().removeClient(this);

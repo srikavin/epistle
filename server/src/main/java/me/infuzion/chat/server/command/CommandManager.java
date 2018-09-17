@@ -19,11 +19,11 @@ package me.infuzion.chat.server.command;
 import me.infuzion.chat.server.ChatServer;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.command.Command;
-import me.infuzion.chat.server.api.command.DefaultCommand;
 import me.infuzion.chat.server.api.command.ICommandExecutor;
 import me.infuzion.chat.server.api.command.ICommandManager;
 import me.infuzion.chat.server.api.event.IEventManager;
 import me.infuzion.chat.server.api.event.command.PreCommandEvent;
+import me.infuzion.chat.server.api.permission.IPermissionManager;
 import me.infuzion.chat.server.command.vanilla.*;
 
 import java.util.HashMap;
@@ -31,8 +31,10 @@ import java.util.Map;
 
 public class CommandManager implements ICommandManager {
     private final Map<Command, ICommandExecutor> pluginCommandExecutors = new HashMap<>();
+    private IPermissionManager permissionManager;
 
     public CommandManager(ChatServer server) {
+        this.permissionManager = server.getPermissionManager();
         final VanillaCommandExecutor[] executors = {
                 new ChatRoomCommand(),
                 new ModeratorCommand(server),
@@ -40,6 +42,7 @@ public class CommandManager implements ICommandManager {
                 new StopCommand(server),
                 new TpsCommand(server),
                 new ClientInfoCommand(server),
+                new ListPermissionsCommand(server),
                 new SayCommand()
         };
 
@@ -72,9 +75,17 @@ public class CommandManager implements ICommandManager {
         }
         System.out.println(client.getName() + " executed: " + command);
 
+
         boolean found = false;
         for (Map.Entry<Command, ICommandExecutor> e : pluginCommandExecutors.entrySet()) {
-            if (e.getKey().equals(new DefaultCommand(command))) {
+
+            if (e.getKey().getName().equals(command)) {
+                //Check permissions
+                if (!permissionManager.hasPermission(e.getKey(), client)) {
+                    client.sendMessage(permissionManager.noPermissionMessage());
+                    return;
+                }
+
                 e.getValue().onCommand(command, args, client);
                 found = true;
             }

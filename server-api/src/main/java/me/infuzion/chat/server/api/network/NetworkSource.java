@@ -14,28 +14,12 @@
  * limitations under the License.
  */
 
-package infuzion.chat.common.network.packet;
+package me.infuzion.chat.server.api.network;
 
-import infuzion.chat.common.DataType;
+public interface NetworkSource {
+    void init();
 
-import java.nio.ByteBuffer;
+    void reload();
 
-public class MessagePacket extends StringPacket {
-    public static final DataType signature = DataType.Message;
-
-    public MessagePacket(String message) {
-        super(signature, message);
-    }
-
-    public MessagePacket(byte[] bytes) {
-        this(ByteBuffer.wrap(bytes));
-    }
-
-    public MessagePacket(ByteBuffer buffer) {
-        super(signature, buffer);
-    }
-
-    public String getMessage() {
-        return getString();
-    }
+    void stop() throws Exception;
 }

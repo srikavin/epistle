@@ -17,6 +17,7 @@
 package me.infuzion.chat.server.api.network;
 
 import infuzion.chat.common.DataType;
+import infuzion.chat.common.network.packet.MessagePacket;
 import infuzion.chat.common.network.packet.NetworkPacket;
 
 import java.io.IOException;
@@ -26,10 +27,6 @@ public interface ClientConnection {
     void close() throws IOException;
 
     int available() throws IOException;
-
-    void write(byte[] bytes) throws IOException;
-
-    ByteBuffer read(int amount) throws IOException;
 
     /**
      * Reads an entire packet from the underlying connection
@@ -44,10 +41,9 @@ public interface ClientConnection {
     ByteBuffer readMessage() throws IOException;
 
     @Deprecated
-    void sendMessage(DataType header, byte[] message) throws IOException;
-
-    @Deprecated
-    void sendMessage(DataType header, String message) throws IOException;
+    default void sendMessage(DataType header, String message) throws IOException {
+        sendPacket(new MessagePacket(message));
+    }
 
     void sendPacket(NetworkPacket packet) throws IOException;
 }

@@ -43,6 +43,7 @@ public class ClientHelloPacket extends NetworkPacket {
         super(signature);
         int usernameLength = buffer.getInt();
 
+        System.out.println(usernameLength);
         byte[] usernameBytes = new byte[usernameLength];
         buffer.get(usernameBytes);
 

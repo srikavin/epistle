@@ -24,19 +24,22 @@ import infuzion.chat.common.network.packet.factory.KeepAlivePacketFactory;
 import infuzion.chat.common.network.packet.factory.MessagePacketFactory;
 import me.infuzion.chat.server.api.IChatClient;
 import me.infuzion.chat.server.api.network.ClientConnection;
+import me.infuzion.chat.server.api.network.NetworkSource;
+import me.infuzion.chat.server.api.network.PacketRouter;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.*;
 import java.util.function.BiConsumer;
 
-public class PacketRouter {
+public class DefaultPacketRouter implements PacketRouter {
     private Map<Short, PacketParser> packetMappings = new HashMap<>();
     private Map<Short, List<BiConsumer<? extends NetworkPacket, IChatClient>>> packetSignatureHandlers =
             new HashMap<>();
-    private List<NetworkPacketHandler<? extends NetworkPacket>> packetHandlers = new ArrayList<>();
+    private Map<Class<? extends NetworkSource>, List<NetworkPacketHandler<? extends NetworkPacket>>> packetHandlers =
+            new HashMap<>();
 
-    public PacketRouter() {
+    public DefaultPacketRouter() {
         this.registerNetworkPacketMappings(Arrays.asList(
                 new ClientHelloPacketFactory(),
                 new CommandPacketFactory(),
@@ -45,7 +48,7 @@ public class PacketRouter {
         ));
     }
 
-    public PacketRouter(List<PacketParser> packetMappings) {
+    public DefaultPacketRouter(List<PacketParser> packetMappings) {
         this.registerNetworkPacketMappings(packetMappings);
     }
 
@@ -53,41 +56,68 @@ public class PacketRouter {
         mappings.forEach((e) -> packetMappings.put(e.getSignature(), e));
     }
 
+    @Override
     public <T extends NetworkPacket> void registerNetworkPacketHandler(Class<T> packet, BiConsumer<T, IChatClient> method) {
-        packetHandlers.add(new NetworkPacketHandler<>(packet, method));
+        this.registerNetworkPacketHandler(packet, method, NetworkSource.class);
     }
 
+    @Override
+    public <T extends NetworkPacket> void registerNetworkPacketHandler(Class<T> packet, BiConsumer<T, IChatClient> method, Class<? extends NetworkSource> source) {
+        packetHandlers.computeIfAbsent(source, (c) -> new ArrayList<>());
+        packetHandlers.get(source).add(new NetworkPacketHandler<>(packet, method));
+
+    }
+
+    @Override
     public <T extends NetworkPacket> void registerNetworkPacketHandler(short signature, BiConsumer<T, IChatClient> method) {
         packetSignatureHandlers.computeIfAbsent(signature, (s) -> new ArrayList<>());
         packetSignatureHandlers.get(signature).add(method);
     }
 
+    @Override
     public void sendNetworkPacket(ClientConnection connection, NetworkPacket packet) throws IOException {
         connection.sendPacket(packet);
     }
 
-    public void handleNetworkPacket(ByteBuffer packetBuffer, IChatClient client) {
+    @Override
+    public NetworkPacket parseBuffer(ByteBuffer packetBuffer) {
         short signature = packetBuffer.getShort();
         PacketParser packetParser = packetMappings.get(signature);
 
         if (packetParser == null) {
             System.out.println(signature);
-//            throw new RuntimeException("Unknown packet signature");
-            return;
+            throw new RuntimeException("Unknown packet signature");
         }
 
-        NetworkPacket packet = packetParser.parse(packetBuffer);
+        return packetParser.parse(packetBuffer);
+    }
+
+    @Override
+    public void handleNetworkPacket(ByteBuffer packetBuffer, IChatClient client) {
+        NetworkPacket packet = parseBuffer(packetBuffer);
         handleNetworkPacket(packet, client);
     }
 
+    @Override
     public void handleNetworkPacket(NetworkPacket packet, IChatClient client) {
-        packetHandlers.forEach(e -> {
-            Class<? extends NetworkPacket> handlerClass = e.packetClass;
-            if (handlerClass.isAssignableFrom(packet.getClass())) {
+        this.handleNetworkPacket(packet, client, NetworkSource.class);
+    }
 
-                //noinspection unchecked
-                ((BiConsumer<NetworkPacket, IChatClient>) e.handler).accept(packet, client);
+    @Override
+    public void handleNetworkPacket(NetworkPacket packet, IChatClient client, Class<? extends NetworkSource> source) {
+        packetHandlers.forEach((desiredSource, list) -> {
+            if (!desiredSource.isAssignableFrom(source)) {
+                return;
             }
+
+            list.forEach((e) -> {
+                Class<? extends NetworkPacket> handlerClass = e.packetClass;
+                if (handlerClass.isAssignableFrom(packet.getClass())) {
+
+                    //noinspection unchecked
+                    ((BiConsumer<NetworkPacket, IChatClient>) e.handler).accept(packet, client);
+                }
+            });
         });
 
         packetSignatureHandlers

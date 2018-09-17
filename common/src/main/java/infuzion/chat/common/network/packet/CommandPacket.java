@@ -19,15 +19,12 @@ package infuzion.chat.common.network.packet;
 import infuzion.chat.common.DataType;
 
 import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
 
-public class CommandPacket extends NetworkPacket {
+public class CommandPacket extends StringPacket {
     public static final DataType signature = DataType.Command;
-    private final String command;
 
     public CommandPacket(String command) {
-        super(signature);
-        this.command = command;
+        super(signature, command);
     }
 
     public CommandPacket(byte[] bytes) {
@@ -35,26 +32,10 @@ public class CommandPacket extends NetworkPacket {
     }
 
     public CommandPacket(ByteBuffer buffer) {
-        super(signature);
-        int commandLength = buffer.getInt();
-        byte[] bytes = new byte[commandLength];
-
-        buffer.get(bytes);
-        this.command = new String(bytes, StandardCharsets.UTF_8);
-    }
-
-    @Override
-    public byte[] asBytes() {
-        byte[] ret = new byte[command.length() + 4];
-        ByteBuffer buffer = ByteBuffer.wrap(ret);
-
-        buffer.putInt(command.length());
-        buffer.put(command.getBytes(StandardCharsets.UTF_8));
-
-        return ret;
+        super(signature, buffer);
     }
 
     public String getCommand() {
-        return command;
+        return getString();
     }
 }

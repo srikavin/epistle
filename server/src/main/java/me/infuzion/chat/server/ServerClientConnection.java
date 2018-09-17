@@ -18,6 +18,7 @@ package me.infuzion.chat.server;
 
 import infuzion.chat.common.DataType;
 import infuzion.chat.common.network.packet.ClientHelloPacket;
+import infuzion.chat.common.network.packet.MessagePacket;
 import infuzion.chat.common.network.packet.NetworkPacket;
 import me.infuzion.chat.server.api.network.ClientConnection;
 
@@ -41,16 +42,6 @@ public class ServerClientConnection implements ClientConnection {
     }
 
     @Override
-    public void write(byte[] bytes) {
-
-    }
-
-    @Override
-    public ByteBuffer read(int amount) {
-        return ByteBuffer.allocate(0);
-    }
-
-    @Override
     public ByteBuffer readMessage() throws IOException {
         if (available() == 0) {
             return ByteBuffer.allocate(0);
@@ -67,19 +58,12 @@ public class ServerClientConnection implements ClientConnection {
     }
 
     @Override
-    public void sendMessage(DataType header, byte[] message) {
-
-    }
-
-    @Override
-    public void sendMessage(DataType header, String message) {
-        System.out.println(message);
-    }
-
-    @Override
     public void sendPacket(NetworkPacket packet) {
         if (packet instanceof ClientHelloPacket) {
             System.out.println(((ClientHelloPacket) packet).getUsername() + " joined");
+        }
+        if (packet instanceof MessagePacket) {
+            System.out.println(((MessagePacket) packet).getMessage());
         }
     }
 }

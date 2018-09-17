@@ -23,6 +23,7 @@ import me.infuzion.chat.server.api.network.ClientConnection;
 import me.infuzion.chat.server.api.permission.PermissionAttachment;
 import me.infuzion.chat.server.permission.DefaultPermissionAttachment;
 
+import java.io.IOException;
 import java.util.UUID;
 
 public class ServerChatClient implements IChatClient {
@@ -38,7 +39,11 @@ public class ServerChatClient implements IChatClient {
 
     @Override
     public void kick(String message) {
-        serverClientConnection.sendMessage(DataType.Message, "Somebody attempted to kick you for " + message);
+        try {
+            serverClientConnection.sendMessage(DataType.Message, "Somebody attempted to kick you for " + message);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

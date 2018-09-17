@@ -20,10 +20,13 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String args[]) throws IOException {
+        ChatServer server;
         if (args.length == 0) {
-            new ChatServer(7776);
+            server = new ChatServer(7776);
         } else {
-            new ChatServer(Integer.parseInt(args[0]));
+            server = new ChatServer(Integer.parseInt(args[0]));
         }
+
+        server.start();
     }
 }

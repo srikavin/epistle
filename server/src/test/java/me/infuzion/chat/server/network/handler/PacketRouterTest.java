@@ -19,7 +19,7 @@ package me.infuzion.chat.server.network.handler;
 import infuzion.chat.common.network.packet.NetworkPacket;
 import infuzion.chat.common.network.packet.PacketParser;
 import me.infuzion.chat.server.api.IChatClient;
-import me.infuzion.chat.server.network.PacketRouter;
+import me.infuzion.chat.server.network.DefaultPacketRouter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,7 +43,7 @@ public class PacketRouterTest {
     @Mock
     private IChatClient client;
 
-    private PacketRouter router;
+    private DefaultPacketRouter router;
 
     @BeforeEach
     public void createInstance() {
@@ -51,7 +51,7 @@ public class PacketRouterTest {
 
         handlers.add(parser);
 
-        router = new PacketRouter(handlers);
+        router = new DefaultPacketRouter(handlers);
     }
 
     @Test

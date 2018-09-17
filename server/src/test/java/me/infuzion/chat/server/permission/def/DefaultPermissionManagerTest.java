@@ -28,6 +28,9 @@ import me.infuzion.chat.server.mock.FakeServerClient;
 import me.infuzion.chat.server.permission.DefaultPermissionAttachment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -38,11 +41,13 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 public class DefaultPermissionManagerTest {
+    @Mock
+    Server server;
+
     @Test
     public void hasPermission() {
-        Server server = new FakeServer();
-
         Map<String, Map<String, List<String>>> map = new HashMap<>();
 
         DefaultPermissionManager defaultPermissionManager = new DefaultPermissionManager(server, map);
@@ -86,7 +91,7 @@ public class DefaultPermissionManagerTest {
         map1.put("permissions", permissions);
         map1.put("group", groups);
         map.put("testGroup", map1);
-        DefaultPermissionManager dPM = new DefaultPermissionManager(new FakeServer(), map);
+        DefaultPermissionManager dPM = new DefaultPermissionManager(server, map);
         assertTrue(dPM.hasPermission("should.have", fakeClient), "Should have this permission");
         assertTrue(dPM.hasPermission("should.have.from.group", fakeClient),
                 "Should have this permission from group");
@@ -132,7 +137,7 @@ public class DefaultPermissionManagerTest {
         map1.put("group", groups);
         map.put("groupB", map1);
 
-        DefaultPermissionManager dPM = new DefaultPermissionManager(new FakeServer(), map);
+        DefaultPermissionManager dPM = new DefaultPermissionManager(server, map);
 
         assertTrue(dPM.hasPermission("directly.attached",
                 fakeClient), "Should have this permission");

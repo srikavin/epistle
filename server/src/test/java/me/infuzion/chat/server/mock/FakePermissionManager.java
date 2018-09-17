@@ -30,6 +30,11 @@ public class FakePermissionManager implements IPermissionManager {
     }
 
     @Override
+    public boolean hasPermission(Command permission, IChatClient chatClient) {
+        return false;
+    }
+
+    @Override
     public boolean hasPermission(Permission permission, IChatClient chatClient) {
         return false;
     }

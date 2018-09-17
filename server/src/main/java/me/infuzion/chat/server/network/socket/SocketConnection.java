@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package me.infuzion.chat.server.network;
+package me.infuzion.chat.server.network.socket;
 
 import infuzion.chat.common.DataType;
 import infuzion.chat.common.network.packet.NetworkPacket;
@@ -56,18 +56,6 @@ public class SocketConnection implements ClientConnection {
         socket.close();
     }
 
-    @Override
-    public void write(byte[] bytes) throws IOException {
-        outStream.write(bytes);
-    }
-
-    @Override
-    public ByteBuffer read(int amount) throws IOException {
-        byte[] buffer = new byte[amount];
-        int bytesRead = inStream.read(buffer);
-        return ByteBuffer.wrap(buffer, 0, bytesRead);
-    }
-
     private void read(byte[] message) throws IOException {
         for (int i = 0; i < message.length; i++) {
             message[i] = inStream.readByte();
@@ -103,21 +91,6 @@ public class SocketConnection implements ClientConnection {
         buffer.rewind();
         buffer.order(ByteOrder.BIG_ENDIAN);
         return buffer;
-    }
-
-    @Override
-    public void sendMessage(DataType header, byte[] message) throws IOException {
-        outStream.writeByte(header.byteValue);
-        outStream.writeInt(message.length);
-        outStream.write(message);
-        outStream.writeByte(DataType.EndOfData.byteValue);
-    }
-
-    @Override
-    public void sendMessage(DataType header, String message) throws IOException {
-        outStream.writeByte(header.byteValue);
-        outStream.writeUTF(message);
-        outStream.writeByte(DataType.EndOfData.byteValue);
     }
 
     @Override

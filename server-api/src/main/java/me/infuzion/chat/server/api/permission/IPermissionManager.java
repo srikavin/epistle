@@ -47,6 +47,16 @@ public interface IPermissionManager {
     boolean hasPermission(String permission, IChatClient chatClient);
 
     /**
+     * Checks if the specified chat client has permission to execute the given command
+     *
+     * @param command    Command
+     * @param chatClient ChatClient to check
+     *
+     * @return A boolean indicating if the client has the specified permission
+     */
+    boolean hasPermission(Command command, IChatClient chatClient);
+
+    /**
      * Checks if the specified chat client has the specified permission
      *
      * @param permission Permission
