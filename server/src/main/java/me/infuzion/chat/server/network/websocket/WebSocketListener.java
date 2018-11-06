@@ -20,13 +20,15 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 public class WebSocketListener extends WebSocketServer {
     private final WebSocketHandler handler;
 
-    public WebSocketListener(WebSocketHandler handler) {
+    public WebSocketListener(WebSocketHandler handler, InetSocketAddress address) {
+        super(address);
         this.handler = handler;
     }
 
@@ -78,8 +80,8 @@ public class WebSocketListener extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
-        handler.removeConnection(webSocket);
         e.printStackTrace();
+        handler.removeConnection(webSocket);
     }
 
     @Override

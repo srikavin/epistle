@@ -61,7 +61,7 @@ public class ChatServer implements Server {
     private NetworkManager networkManager;
     private DefaultPacketRouter packetRouter = new DefaultPacketRouter();
 
-    ChatServer(int port) throws IOException {
+    ChatServer(int port, int wsPort) throws IOException {
         chatRoomManager = new ChatRoomManager();
         IChatClient serverClient = new ServerChatClient();
         clients.add(serverClient);
@@ -71,7 +71,7 @@ public class ChatServer implements Server {
 
         networkManager = new NetworkManager(this);
         networkManager.addSource(new SocketHandler(networkManager, port));
-        networkManager.addSource(new WebSocketHandler(networkManager));
+        networkManager.addSource(new WebSocketHandler(networkManager, wsPort));
         networkManager.init();
 
         reload();

@@ -19,14 +19,23 @@ package me.infuzion.chat.server;
 import java.io.IOException;
 
 public class Main {
-    public static void main(String args[]) throws IOException {
+    public static void main(String[] args) throws IOException {
         ChatServer server;
-        if (args.length == 0) {
-            server = new ChatServer(7776);
-        } else {
-            server = new ChatServer(Integer.parseInt(args[0]));
+        int socketPort = 7776;
+        int wsPort = 80;
+        for (String e : args) {
+            if (e.startsWith("-sPort")) {
+                socketPort = Integer.parseInt(e.substring("-sPort".length()));
+                continue;
+            }
+            if (e.startsWith("-wsPort")) {
+                wsPort = Integer.parseInt(e.substring("-wsPort".length()));
+                continue;
+            }
+            System.out.println("Unknown argument: " + e);
+            return;
         }
-
+        server = new ChatServer(socketPort, wsPort);
         server.start();
     }
 }

@@ -24,6 +24,7 @@ import me.infuzion.chat.server.network.NetworkManager;
 import org.java_websocket.WebSocket;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,15 +35,17 @@ public class WebSocketHandler implements NetworkSource {
     private final Queue<WebSocket> joinedQueue = new ConcurrentLinkedQueue<>();
     private final Map<WebSocketConnection, IChatClient> connectionMap = new HashMap<>();
     private final NetworkManager manager;
+    private final InetSocketAddress socketAddress;
     private WebSocketListener webSocketListener;
 
-    public WebSocketHandler(NetworkManager manager) {
+    public WebSocketHandler(NetworkManager manager, int port) {
         this.manager = manager;
+        this.socketAddress = new InetSocketAddress("0.0.0.0", port);
     }
 
     @Override
     public void init() {
-        webSocketListener = new WebSocketListener(this);
+        webSocketListener = new WebSocketListener(this, socketAddress);
         webSocketListener.start();
         System.out.println("Listening for websocket connections on port " + webSocketListener.getPort());
     }
