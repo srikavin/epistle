@@ -21,6 +21,7 @@ import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
 import me.infuzion.chat.server.network.socket.SocketConnection;
+import me.infuzion.chat.server.network.websocket.WebSocketConnection;
 
 import java.util.UUID;
 
@@ -49,6 +50,10 @@ public class ClientInfoCommand implements VanillaCommandExecutor {
                         chatroom = e.getChatRoom().getName();
                         if (e.getConnection() instanceof SocketConnection) {
                             ip = ((SocketConnection) e.getConnection()).getSocket().getInetAddress().toString();
+                        }
+                        if (e.getConnection() instanceof WebSocketConnection) {
+                            ip = ((WebSocketConnection) e.getConnection())
+                                    .getWebSocket().getRemoteSocketAddress().getAddress().getHostAddress();
                         }
                     }
                 }
