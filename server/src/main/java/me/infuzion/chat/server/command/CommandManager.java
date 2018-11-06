@@ -43,7 +43,7 @@ public class CommandManager implements ICommandManager {
                 new TpsCommand(server),
                 new ClientInfoCommand(server),
                 new ListPermissionsCommand(server),
-                new SayCommand()
+                new SayCommand(server)
         };
 
         for (VanillaCommandExecutor e : executors) {

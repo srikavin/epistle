@@ -25,12 +25,14 @@ import me.infuzion.chat.server.api.command.ICommandManager;
 import me.infuzion.chat.server.api.event.IEventManager;
 import me.infuzion.chat.server.api.network.NetworkSource;
 import me.infuzion.chat.server.api.network.PacketRouter;
+import me.infuzion.chat.server.api.permission.DefaultPermission;
 import me.infuzion.chat.server.api.permission.IPermissionManager;
 import me.infuzion.chat.server.api.plugin.loader.IPluginManager;
 import me.infuzion.chat.server.command.CommandManager;
 import me.infuzion.chat.server.event.EventManager;
 import me.infuzion.chat.server.network.DefaultPacketRouter;
 import me.infuzion.chat.server.network.NetworkManager;
+import me.infuzion.chat.server.network.ServerClientHandler;
 import me.infuzion.chat.server.network.socket.SocketHandler;
 import me.infuzion.chat.server.network.websocket.WebSocketHandler;
 import me.infuzion.chat.server.permission.def.DefaultPermissionManager;
@@ -64,6 +66,7 @@ public class ChatServer implements Server {
     ChatServer(int port, int wsPort) throws IOException {
         chatRoomManager = new ChatRoomManager();
         IChatClient serverClient = new ServerChatClient();
+        serverClient.getPermissionAttachment().addPermission(new DefaultPermission("*"));
         clients.add(serverClient);
         chatRoomManager.addClient(serverClient);
         pluginManager = new PluginManager(this);
@@ -72,6 +75,7 @@ public class ChatServer implements Server {
         networkManager = new NetworkManager(this);
         networkManager.addSource(new SocketHandler(networkManager, port));
         networkManager.addSource(new WebSocketHandler(networkManager, wsPort));
+        networkManager.addSource(new ServerClientHandler(networkManager));
         networkManager.init();
 
         reload();

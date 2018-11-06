@@ -18,10 +18,17 @@ package me.infuzion.chat.server.command.vanilla;
 
 import me.infuzion.chat.server.ChatRoom;
 import me.infuzion.chat.server.api.IChatClient;
+import me.infuzion.chat.server.api.Server;
 import me.infuzion.chat.server.api.command.Command;
 import me.infuzion.chat.server.api.command.DefaultCommand;
+import me.infuzion.chat.server.api.permission.IPermissionManager;
 
 public class SayCommand implements VanillaCommandExecutor {
+    public SayCommand(Server server) {
+        IPermissionManager permissionManager = server.getPermissionManager();
+        permissionManager.registerPermission("say", "server.say");
+    }
+
     @Override
     public Command[] getCommands() {
         return new Command[]{
