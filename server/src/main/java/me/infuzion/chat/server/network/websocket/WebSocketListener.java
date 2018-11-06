@@ -16,22 +16,15 @@
 
 package me.infuzion.chat.server.network.websocket;
 
-import me.infuzion.chat.server.api.IChatClient;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class WebSocketListener extends WebSocketServer {
     private final WebSocketHandler handler;
-    private List<IChatClient> clients = new CopyOnWriteArrayList<>();
-    private Queue<WebSocket> joined = new ConcurrentLinkedQueue<>();
 
     public WebSocketListener(WebSocketHandler handler) {
         this.handler = handler;
@@ -44,7 +37,7 @@ public class WebSocketListener extends WebSocketServer {
 
     @Override
     public void onClose(WebSocket webSocket, int i, String s, boolean b) {
-        clients.remove(webSocket.getAttachment());
+        handler.removeConnection(webSocket);
     }
 
     @Override
@@ -85,6 +78,7 @@ public class WebSocketListener extends WebSocketServer {
 
     @Override
     public void onError(WebSocket webSocket, Exception e) {
+        handler.removeConnection(webSocket);
         e.printStackTrace();
     }
 

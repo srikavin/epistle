@@ -51,10 +51,11 @@ public class WebSocketHandler implements NetworkSource {
     public void reload() {
         manager.getPacketRouter().registerNetworkPacketHandler(ClientHelloPacket.class, (packet, client) -> {
             WebSocket webSocket = joinedQueue.remove();
-            IChatClient newClient =
-                    new ChatClient(packet.getUsername(), packet.getUuid(), new WebSocketConnection(webSocket, this));
+            WebSocketConnection connection = new WebSocketConnection(webSocket, this);
+            IChatClient newClient = new ChatClient(packet.getUsername(), packet.getUuid(), connection);
             manager.addClient(newClient);
             webSocket.setAttachment(newClient);
+            connectionMap.put(connection, newClient);
         }, getClass());
     }
 

@@ -75,11 +75,13 @@ public class NetworkManager {
         packetRouter.registerNetworkPacketHandler(MessagePacket.class, messagePacketHandler::handle);
         packetRouter.registerNetworkPacketHandler(ClientHelloPacket.class, ((packet, client) -> {
             System.out.println(packet.getUsername() + " has joined!");
+
         }));
         sources.forEach(NetworkSource::reload);
     }
 
     public void addClient(IChatClient client) {
+        System.out.println("adding client");
         server.getConnectedClients().add(client);
         client.setChatRoom(server.getChatRoomManager().getChatRooms().get(0));
         server.getChatRoomManager().addClient(client);

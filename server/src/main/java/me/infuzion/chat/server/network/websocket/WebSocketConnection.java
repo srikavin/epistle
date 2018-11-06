@@ -70,6 +70,10 @@ public class WebSocketConnection implements ClientConnection {
         buffer.put(data);
         buffer.put(DataType.EndOfData.byteValue);
 
-        webSocket.send(ret);
+        if (webSocket.isOpen()) {
+            webSocket.send(ret);
+        } else {
+            webSocketHandler.removeConnection(this);
+        }
     }
 }

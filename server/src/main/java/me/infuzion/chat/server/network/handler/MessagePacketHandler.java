@@ -37,7 +37,6 @@ public class MessagePacketHandler {
         MessageEvent messageEvent = new MessageEvent(client, message);
         eventManager.fireEvent(messageEvent);
         if (messageEvent.isCanceled()) {
-            System.out.println("CANCELLED");
             return;
         }
         chatRoomManager.sendMessageAll(message, client, client.getChatRoom());
