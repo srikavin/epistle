@@ -1,4 +1,4 @@
-# Chat [![Build Status](https://travis-ci.org/srikavin/Chat.svg?branch=master)](https://travis-ci.org/srikavin/Chat)[![codecov](https://codecov.io/gh/srikavin/Chat/branch/master/graph/badge.svg)](https://codecov.io/gh/srikavin/Chat)
+# Chat [![Build Status](https://travis-ci.org/srikavin/epistle.svg?branch=master)](https://travis-ci.org/srikavin/epistle)[![codecov](https://codecov.io/gh/srikavin/epistle/branch/master/graph/badge.svg)](https://codecov.io/gh/srikavin/epistle)
 
 A simple chat server and client written in Java.
 
